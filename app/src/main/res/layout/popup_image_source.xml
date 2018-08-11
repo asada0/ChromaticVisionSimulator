@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup_image_source_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/balloon_bg" >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical ="true"
+        android:gravity="center"
+        android:orientation="horizontal" >
+        <RadioButton
+            android:id="@+id/radio_rear"
+            android:contentDescription="@string/sRearCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radio_rear_camera"
+            android:button="@null" />
+        <RadioButton
+            android:id="@+id/radio_front"
+            android:contentDescription="@string/sFrontCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radio_front_camera"
+            android:button="@null" />
+        <RadioButton
+            android:id="@+id/radio_file"
+            android:contentDescription="@string/sFile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radio_photo_album"
+            android:button="@null" />
+    </LinearLayout>
+</RelativeLayout>

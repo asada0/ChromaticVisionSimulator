@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="asada0.android.cvsimulator.MainActivity">
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/gl_surface_view_camera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/gl_surface_view_file"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/tool_panel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_gravity="bottom"
+            android:background="@color/White"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_gravity="start"
+                android:padding="6dp"
+                android:background="@drawable/clear"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/radio_c"
+                    android:contentDescription="@string/sCChar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/radio_type_left"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:shadowColor="@color/Black"
+                    android:shadowDy="-2"
+                    android:shadowRadius="5"
+                    android:text="@string/sCChar"
+                    android:textColor="@drawable/radio_type_text_color"
+                    android:textStyle="bold"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/radio_p"
+                    android:contentDescription="@string/sPChar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/radio_type_middle"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:shadowColor="@color/Black"
+                    android:shadowDy="-2"
+                    android:shadowRadius="5"
+                    android:text="@string/sPChar"
+                    android:textColor="@drawable/radio_type_text_color"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radio_d"
+                    android:contentDescription="@string/sDChar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/radio_type_middle"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:shadowColor="@color/Black"
+                    android:shadowDy="-2"
+                    android:shadowRadius="5"
+                    android:text="@string/sDChar"
+                    android:textColor="@drawable/radio_type_text_color"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radio_t"
+                    android:contentDescription="@string/sTChar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/radio_type_right"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:shadowColor="@color/Black"
+                    android:shadowDy="-2"
+                    android:shadowRadius="5"
+                    android:text="@string/sTChar"
+                    android:textColor="@drawable/radio_type_text_color"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_gravity="end"
+                android:paddingTop="7dp"
+                android:background="@drawable/clear"
+                android:orientation="horizontal" >
+
+                <android.support.v4.widget.Space
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp" />
+
+                <RelativeLayout
+                    android:id="@+id/badge_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <RelativeLayout
+                        android:id="@+id/badged_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/button_simulation_ratio"
+                            android:contentDescription="@string/sSimulationRatio"
+                            android:layout_width="40dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/button_eye"
+                            android:gravity="center"
+                            android:adjustViewBounds="true" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/badge_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignEnd="@id/badged_button"
+                        android:background="@drawable/badge_ratio"
+                        android:text="100"
+                        android:textColor="@color/White"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <android.support.v4.widget.Space
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp" />
+
+                <Button
+                    android:id="@+id/button_image_source"
+                    android:contentDescription="@string/sCameraFileSwap"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/button_camera_file_swap"
+                    android:adjustViewBounds="true" />
+
+                <android.support.v4.widget.Space
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp" />
+
+                <Button
+                    android:id="@+id/button_save"
+                    android:contentDescription="@string/sSave"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/button_camera"
+                    android:gravity="center"
+                    android:adjustViewBounds="true" />
+
+                <android.support.v4.widget.Space
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

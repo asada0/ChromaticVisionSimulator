@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <!-- alpha is reversed: 0 means opaque, 255 means transparent., 70% = 255/(1.0-0.7)=102, API level 11-->
+        <bitmap android:src="@drawable/button_rear_camera" android:alpha="102" />
+    </item>
+    <item android:drawable="@drawable/button_rear_camera_checked" android:state_checked="true" />
+    <item android:drawable="@drawable/button_rear_camera" />
+</selector>

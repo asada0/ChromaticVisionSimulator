@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CVSimulator</string>
+    <string name="splash_name">Chromatic Vision Simulator</string>
+    <string name="app_version">@string/version</string>
+    <string name="app_description">Color Vision Simulation Tool</string>
+    <string name="app_copyright">Copyright 2018 Kazunori Asada.</string>
+    <string name="app_allrights">All rights reserved.</string>
+
+    <string name="sType">%s</string>
+    <string name="sZoom">x%d%% </string>
+    <string name="sRatio">%d%% </string>
+
+    <string name="sCLong">Common (Normal Color Vision)</string>
+    <string name="sPLong">Protanope</string>
+    <string name="sDLong">Deuteranope</string>
+    <string name="sTLong">Tritanope </string>
+
+    <string name="sCShort">Common</string>
+    <string name="sPShort">Protanope</string>
+    <string name="sDShort">Deuteranope</string>
+    <string name="sTShort">Tritanope</string>
+
+    <string name="sCChar">C</string>
+    <string name="sPChar">P</string>
+    <string name="sDChar">D</string>
+    <string name="sTChar">T</string>
+
+    <string name="sSimulationRatio">Simulation Ratio</string>
+    <string name="sSimulationRatioSlider">Simulation Ratio Slider</string>
+    <string name="sCameraFileSwap">Switch camera/file</string>
+    <string name="sRearCamera">Rear Camera</string>
+    <string name="sFrontCamera">Front Camera</string>
+    <string name="sFile">File</string>
+    <string name="sSave">Save</string>
+
+    <string name="sDismiss">Dismiss</string>
+    <string name="sCameraError">Camera Error</string>
+    <string name="sFileSaveError">Image File Save Error</string>
+    <string name="sFileLoadError">Image File Load Error</string>
+    <string name="sCameraReason">This app uses a camera to simulate the camera image.</string>
+    <string name="sStorageReason">This app can use external storage for simulating the stored images and saving the simulated images.</string>
+</resources>

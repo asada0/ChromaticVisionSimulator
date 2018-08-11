@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup_simulation_ratio_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/balloon_bg"
+    android:gravity="center"
+    android:orientation="vertical" >
+        <ImageView
+            android:contentDescription="100"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/slider_simulation100" />
+        <FrameLayout
+            android:layout_width="35dp"
+            android:layout_height="160dp"
+            android:layout_marginTop="-4dp"
+            android:orientation="vertical">
+                <SeekBar
+                    android:id="@+id/slider_ratio"
+                    android:contentDescription="@string/sSimulationRatioSlider"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:rotation="270"
+                    android:background="@drawable/clear"
+                    android:progressDrawable="@drawable/slider_track"
+                    android:thumb="@drawable/slider_thumb_silver"
+                    android:splitTrack="false"
+                    android:minHeight="10dp"
+                    android:maxHeight="10dp"
+                    android:progress="100" />
+        </FrameLayout>
+        <ImageView
+            android:contentDescription="0"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dp"
+            android:src="@drawable/slider_simulation0" />
+</LinearLayout>

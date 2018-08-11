@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">色觉模拟器</string>
+    <string name="splash_name">色觉模拟器</string>
+    <string name="app_version">@string/version</string>
+    <string name="app_description">Color Vision Simulation Tool</string>
+    <string name="app_copyright">Copyright 2018 Kazunori Asada.</string>
+    <string name="app_allrights">All rights reserved.</string>
+
+    <string name="sType">%s</string>
+    <string name="sZoom">x%d%% </string>
+    <string name="sRatio">%d%% </string>
+
+    <string name="sCLong">C（常见型色觉）</string>
+    <string name="sPLong">P（第一型色觉）</string>
+    <string name="sDLong">D（第二型色觉）</string>
+    <string name="sTLong">T（第三型色觉）</string>
+
+    <string name="sCShort">C（常见型）</string>
+    <string name="sPShort">P（第一型）</string>
+    <string name="sDShort">D（第二型）</string>
+    <string name="sTShort">T（第三型）</string>
+
+    <string name="sCChar">C</string>
+    <string name="sPChar">P</string>
+    <string name="sDChar">D</string>
+    <string name="sTChar">T</string>
+
+    <string name="sSimulationRatio">模拟强度</string>
+    <string name="sSimulationRatioSlider">模拟强度滑块</string>
+    <string name="sCameraFileSwap">相机文件切换</string>
+    <string name="sRearCamera">后置摄像头</string>
+    <string name="sFrontCamera">前置摄像头</string>
+    <string name="sFile">文件</string>
+    <string name="sSave">存储</string>
+
+    <string name="sDismiss">收到</string>
+    <string name="sCameraError">相机错误</string>
+    <string name="sFileSaveError">图像保存错误</string>
+    <string name="sFileLoadError">图像加载错误</string>
+    <string name="sCameraReason">此应用程序使用相机来模拟相机图像。</string>
+    <string name="sStorageReason">该应用程序可以使用外部存储器来保存图像模拟和保存模拟图像。</string>
+</resources>

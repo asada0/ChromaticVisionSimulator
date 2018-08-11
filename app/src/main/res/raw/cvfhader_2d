@@ -1,0 +1,104 @@
+//
+//  cvfshader_2d
+//  Chromatic Vision Simulator
+//
+//  Created by Kazunori Asada on 2010/04/12.
+//  Copyright 2010-2018 Kazunori Asada. All rights reserved.
+//
+
+precision mediump float;
+
+uniform sampler2D sTexture;
+varying vec2 vTextureCoord;
+uniform float ratio;
+uniform int mode;
+
+void main() {
+
+	const mat3 matRGBtoLMS = mat3(      // sRGB to LMS (IEC 61966-2-1 and Hunt-Pointer-Estevez, D65)
+		0.313935103000000,	0.639568792000000,	0.0465221350000000,
+		0.155302922000000,	0.757959424000000,	0.0867268040000000,
+		0.0177216460000000,	0.109451824000000,	0.872768110000000
+    );
+
+	const mat3 matLMStoRGB = mat3(      // LMS to sRGB (IEC 61966-2-1 and Hunt-Pointer-Estevez, D65)
+		 5.47213088809908,   -4.64189045809668,  0.169576672588330,
+		-1.12464246757831,    2.29254888866891, -0.167862078994379,
+		 0.0299266238769310, -0.193249175894864, 1.16338764138036
+	);
+
+	const mat3 matN0 = mat3(            // Normal
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matP0 = mat3(			// Protanope (Vienot, 1999)
+		0.0, 1.05118653815772, -0.0511520910889411,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matP1 = mat3(			// Protanope (Brettel, 1997)
+        0.0, 1.20800080913082, -0.207973822152729,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matP2 = mat3(			// Protanope (Brettel, 1997)
+        0.0, 1.22023002746029, -0.220203622260109,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matD0 = mat3(			// Deuteranope (Vienot, 1999)
+		1.0, 0.0, 0.0,
+		0.951305942095275, 0.0, 0.0486612882035085,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matD1 = mat3(			// Deuteranope (Brettel, 1997)
+		1.0, 0.0, 0.0,
+        0.827814015058087, 0.0, 0.172163644743227,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matD2 = mat3(			// Deuteranope (Brettel, 1997)
+		1.0, 0.0, 0.0,
+        0.819517613479266, 0.0, 0.180460746994094,
+		0.0, 0.0, 1.0
+	);
+
+	const mat3 matT0 = mat3(			// Tritanope (Vienot, 1999)
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		-0.867282128803180, 1.86726654399899, 0.0
+	);
+
+	const mat3 matT1 = mat3(			// Tritanope (Brettel, 1997)
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+        -0.525432694548623, 1.52540450220051, 0.0
+	);
+
+	const mat3 matT2 = mat3(			// Tritanope (Brettel, 1997)
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+        -0.875044108111990, 1.87502880957271, 0.0
+	);
+
+	vec2 newTex = vTextureCoord.xy;
+	vec4 col = clamp(texture2D(sTexture, newTex).rgba, 0.0, 1.0);
+
+	vec3 z = pow((col.rgb + 0.055) / 1.055, vec3(2.4)) * matRGBtoLMS;
+
+	mat3 matN = float(mode == 0) * matN0;
+	mat3 matP = float(mode == 1) * (float(z.z <= z.y) * matP1 + float(z.z > z.y) * matP2);
+	mat3 matD = float(mode == 2) * (float(z.z <= z.x) * matD1 + float(z.z > z.x) * matD2);
+	mat3 matT = float(mode == 3) * (float(z.y <= z.x) * matT1 + float(z.y > z.x) * matT2);
+
+	z = clamp(1.055 * pow(mix(z, z * (matN + matP + matD + matT), ratio) * matLMStoRGB, vec3(1.0 / 2.4)) - 0.055, 0.0, 1.0);
+
+	gl_FragColor.rgb = z;
+
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <item>
+        <bitmap android:src="@drawable/splash_back" />
+    </item>
+    <item>
+        <nine-patch android:src="@drawable/splash_eye" />
+    </item>
+    <item>
+        <nine-patch android:src="@drawable/splash_shadow" />
+    </item>
+    <item>
+        <bitmap android:src="@drawable/splash_cover" />
+    </item>
+</layer-list>

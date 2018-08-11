@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">色のシミュレータ</string>
+    <string name="splash_name">色のシミュレータ</string>
+    <string name="app_version">@string/version</string>
+    <string name="app_description">Color Vision Simulation Tool</string>
+    <string name="app_copyright">Copyright 2018 Kazunori Asada.</string>
+    <string name="app_allrights">All rights reserved.</string>
+
+    <string name="sType">%s</string>
+    <string name="sZoom">x%d%% </string>
+    <string name="sRatio">%d%% </string>
+
+    <string name="sCLong">C（一般型色覚）</string>
+    <string name="sPLong">P（1型2色覚）</string>
+    <string name="sDLong">D（2型2色覚）</string>
+    <string name="sTLong">T（3型2色覚）</string>
+
+    <string name="sCShort">C（一般型）</string>
+    <string name="sPShort">P（1型）</string>
+    <string name="sDShort">D（2型）</string>
+    <string name="sTShort">T（3型）</string>
+
+    <string name="sCChar">C</string>
+    <string name="sPChar">P</string>
+    <string name="sDChar">D</string>
+    <string name="sTChar">T</string>
+
+    <string name="sSimulationRatio">シミュレーション強度</string>
+    <string name="sSimulationRatioSlider">シミュレーション強度スライダー</string>
+    <string name="sCameraFileSwap">カメラ・ファイル切替</string>
+    <string name="sRearCamera">リアカメラ</string>
+    <string name="sFrontCamera">フロントカメラ</string>
+    <string name="sFile">ファイル</string>
+    <string name="sSave">保存</string>
+
+    <string name="sDismiss">了解</string>
+    <string name="sCameraError">カメラエラー</string>
+    <string name="sFileSaveError">画像保存エラー</string>
+    <string name="sFileLoadError">画像読込エラー</string>
+    <string name="sCameraReason">カメラ画像をシミュレーションするためにカメラを使用します。</string>
+    <string name="sStorageReason">保存画像のシミュレーション、シミュレーション画像の保存のために外部ストレージを使用できます。</string>
+</resources>
