@@ -35,11 +35,11 @@ These color visions are predictable by calculating working of the cone cells tha
 
 ## Announcement
 Announcement of making Open-Source version is here.  
-<https://asada.tukusi.ne.jp/cvsimulator/e/announce.html>
+<http://asada.tukusi.ne.jp/cvsimulator/e/announce.html>
 
 ## Official Website
 Official website of the "Chromatic Vision Simulator" is here.  
-<https://asada.tukusi.ne.jp/cvsimulator/e>
+<http://asada.tukusi.ne.jp/cvsimulator/e>
 
 ## User's Guide
 User's Guide of this application is in the official website.  
