@@ -1,70 +1,71 @@
 # ChromaticVisionSimulator
 
-This is an open source code of the **“Chromatic Vision Simulator"** Android version 3.0.
+**「色のシミュレータ」** Android version 3.0のソースコードです。
 
 <p align="center">
 <img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/cvsimulatoricon.png">
 </p>
 
-## What is "Chromatic Vision Simulator"?
+##「色のシミュレータ」とは?
 
-- "Chromatic Vision Simulator" is an experience tool which simulates color vision of color vision deficiencies.
-- This software makes and shows you a simulated image from built-in camera or image file in real-time.
-- Supports "Normal Color Vision," "Protanope," "Deuteranope" and "Tritanope" color deficient types.
-- Developed by Kazunori Asada (Ph.D. Medical Science and Media Design) based on the research in color science.
-
-<p align="center">
-<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/Boot-e3.0a.jpg" width="240"> 
-<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/Home-e3.0a.jpg" width="240"> 
-</p>
-
-## Background
-About 5% of men have difficultly distinguishing red and green, or recognizing dark red. Such color deficiency can be classified into three major categories: Protanope / Protanomal, Deuteranope / Deuteranomal and Tritanope / Tritanomal.
-
-Color deficiencies are the inability to tell differences between some colors other people can easily distinguish. People with different types of color vision deficiency perceive colors differently. For example, individuals diagnosed as Protan or Deutan cannot perceive differences between red and green, and pink and cyan.
-
-These color visions are predictable by calculating working of the cone cells that perceive colors to some degree.
-
-"Chromatic Vision Simulator" makes a simulated image of each color vision type of dichromat from built-in camera or image file and shows you how people with a specific type of color deficiency see the world in real-time.
+- 「色のシミュレータ」は、様々な色覚を持つ人の色の見え方をシミュレーションする色覚シミュレーションツールです。
+- スマートデバイスの内蔵カメラまたは画像ファイルから得た画像をリアルタイムに変換し、それぞれの色覚タイプ（2色覚）ではどのように色が見えるのか、シミュレーションを行います。
+- 1型（P型）、2型（D型）、3型（T型）の2色覚の色の見えをリアルタイムに確認し、一般型（C型）の色の見えと比較することができます。
+- 色彩学の理論に基づき、博士（医学・メディアデザイン学）である作者により開発されました。
 
 <p align="center">
-<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/About-e3.0a.jpg" width="240"> 
-<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/Manual-e3.0a.jpg" width="240"> 
+<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/Boot-j3.0a.jpg" width="240"> 
+<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/Home-j3.0a.jpg" width="240"> 
+</p>
+
+## バックグラウンド
+男性の約5%が、赤と緑の色の区別がしにくい、濃い赤が見えにくいなどの色覚的な特徴を持っていると言われています。色覚タイプは主に、一般型（C型）、1型（P型）、2型（D型）、3型（T型）などがあることが知られており、それぞれのタイプや強度によって色の見え方が違います。
+
+1～3型の色覚タイプを持つ人は、一般型の人なら異なって見える多くの色が、同じ色に見えてしまうという特徴があります。例えば、1型や2型の人は、赤と緑、ピンクと水色などの区別が難しい場合があります。
+
+これらの色の見えは、色を感知する錐体細胞の働きを計算することによって、ある程度予測することが可能です。
+
+「色のシミュレータ」は、内蔵カメラまたは画像ファイルから得た画像をリアルタイムに変換し、それぞれの色覚タイプを持つ人がどのように色が見えているのか、シミュレーションを行います。
+
+<p align="center">
+<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/About-j3.0a.jpg" width="240"> 
+<img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/Manual-j3.0a.jpg" width="240"> 
 </p>
 
 
-## Announcement
-Announcement of making Open-Source version is here.  
-<http://asada.tukusi.ne.jp/cvsimulator/e/announcement.html>
+## アナウンス
+オープンソース化に当たってのアナウンスはこちら。
+<http://asada.tukusi.ne.jp/cvsimulator/j/announcement.html>
 
-## Official Website
-Official website of the "Chromatic Vision Simulator" is here.  
-<http://asada.tukusi.ne.jp/cvsimulator/e>
+## 公式ウェブサイト
+「色のシミュレータ」の公式ウェブサイトはこちら。  
+<http://asada.tukusi.ne.jp/cvsimulator/>
 
-## User's Guide
-User's Guide of this application is in the official website.  
-<http://asada.tukusi.ne.jp/cvsimulator/e/manual.html>
+## マニュアル
+このアプリのマニュアルは公式サイトにあります。
+<http://asada.tukusi.ne.jp/cvsimulator/j/manual.html>
 
-## Requirements
+## 動作条件
 
-Android  device with Android 5.0 (API level 21) or later and OpenGL ES2.0 or later.
+Android 5.0 (API level 21) 以上、 OpenGL ES2.0以上を搭載するAndroidデバイス。  
+Android Studio。
 
-## Cautions
+## 注意
 
-- A simulation algorithm is based on a proposal method of academic research described below.  
+- 本アプリで使用しているシミュレーションアルゴリズムは、下記の学術論文の提案手法に基づいており、それぞれの色覚タイプを持つ人のうちもっとも強度の、2色覚者が見ているであろう色を高速演算により再現しています。  
 > H. Brettel, F.Viénot, and J. D. Mollon: Computerized simulation of color appearance for dichromats, Journal of the Optical Society of America A, vol.14, no.10, pp.2647-2655 (Oct. 1997).   
 
-- Simulated images by this software are predicted images of dichromat vision under specific condition with specific method and not necessarily accurate. There is an individual variation in color vision.
-- Although this application has the ability to simulate with the "Simulation Intensity", it is just a function which makes a simple linear interpolation image between the dichromat(the strongest color vision deficiency) simulation and normal vision (original), and it is not intended to simulate the vision of anomalous trichromat(weak color vision deficiency).
+- 本アプリで表示しているシミュレーション画像は、2色覚者の色の見えを特定の手法と条件下で予測したものであり、必ずしも正確とは限りません。また、色覚には個人差があります。 
+- 本アプリには「シミュレーション強度」を指定してシミュレーションを行う機能がありますが、これは、それぞれの色覚タイプを持つ人のうちもっとも強度の、2色覚者が見ているであろう色のシミュレーション画像を100%とし、オリジナル画像を0%として、それらの中間画像をLMS色空間上で線形補間をして求めた画像を表示する機能であり、異常3色覚（弱度の色覚異常）者の色の見えをシミュレーションするものではありません。
 
-## Notes
+## ノート
 
-This application software was developed by Kazunori Asada (Ph.D. of Medical Science and Ph.D. of Media design).
+このアプリは、浅田 一憲（医学・メディアデザイン学）によって開発されました。
 
-## Acknowledgment
-I wish to express my gratitude to Mr. Hirofumi Ukawa and Masataka Matsuda who helped development of the open-source version.
+## 謝辞
+本バージョンの開発にあたって、多くの時間と労力を使ってお手伝いいただいた盟友の鵜川 裕文さん、松田 雅孝さん、そしてテストに協力してくださった全ての友人に感謝申し上げます。
 
-## License
+## ライセンス
 ### The MIT License (MIT)  
 
 Copyright 2018 Kazunori Asada
@@ -75,42 +76,42 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## Appendix
-### Mathematical Expressions for Color Vision Simulation in this application 
+## 付録
+### 本アプリケーションの色覚シミュレーションで使用している数式 
 
-(1) Convert RGB color from sRGB(gammaed) to sRGB(linear) (IEC 61966-2-1)
+(1) sRGB(gammaed)からsRGB(linear)へRGB色の変換 (IEC 61966-2-1)
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{matrix}&space;R_{linear}=\left&space;(&space;\frac{R_{device}&plus;0.055}{1.055}&space;\right&space;)^{2.4}\\\\&space;G_{linear}=\left&space;(&space;\frac{G_{device}&plus;0.055}{1.055}&space;\right&space;)^{2.4}\\\\&space;B_{linear}=\left&space;(&space;\frac{B_{device}&plus;0.055}{1.055}&space;\right&space;)^{2.4}&space;\end{matrix}" title="\begin{matrix} R_{linear}=\left ( \frac{R_{device}+0.055}{1.055} \right )^{2.4}\\\\ G_{linear}=\left ( \frac{G_{device}+0.055}{1.055} \right )^{2.4}\\\\ B_{linear}=\left ( \frac{B_{device}+0.055}{1.055} \right )^{2.4} \end{matrix}" />
 
-(2) Convert color space from sRGB to CIEXYZ (IEC 61966-2-1)
+(2) sRGBからCIEXYZへ色空間の変換 (IEC 61966-2-1)
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0.4124&space;&&space;0.3576&space;&&space;0.1805\\&space;0.2126&space;&&space;0.7152&space;&&space;0.0722\\&space;0.0193&space;&&space;0.1192&space;&&space;0.9595&space;\end{pmatrix}&space;\begin{pmatrix}&space;R_{linear}\\&space;G_{linear}\\&space;B_{linear}&space;\end{pmatrix}" title="\begin{pmatrix} X\\ Y\\ Z \end{pmatrix} = \begin{pmatrix} 0.4124 & 0.3576 & 0.1805\\ 0.2126 & 0.7152 & 0.0722\\ 0.0193 & 0.1192 & 0.9595 \end{pmatrix} \begin{pmatrix} R_{linear}\\ G_{linear}\\ B_{linear} \end{pmatrix}" />
 
-(3) Convert color space from CIEXYZ to LMS (Hunt-Pointer-Estevez, Normalized to D65)
+(3) CIEXYZからLMSへ色空間の変換 (Hunt-Pointer-Estevez, D65照明に正規化)
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0.40024&space;&&space;0.70760&space;&&space;-0.08081\\&space;-0.22630&space;&&space;1.16532&space;&&space;0.04570\\&space;0&space;&&space;0&space;&&space;0.91822&space;\end{pmatrix}&space;\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}" title="\begin{pmatrix} L\\ M\\ S \end{pmatrix} = \begin{pmatrix} 0.40024 & 0.70760 & -0.08081\\ -0.22630 & 1.16532 & 0.04570\\ 0 & 0 & 0.91822 \end{pmatrix} \begin{pmatrix} X\\ Y\\ Z \end{pmatrix}" />
 
-(4) Color Vision Simulation on LMS color space
+(4) LMS色空間において色覚シミュレーションを実行
 
-Simulated color is calculate as projected orginal color to the color perception half plane.
+シミュレーション後の色は、原色の色知覚折れ平面への射影として求める。
 
-- (4-1) for Protanope (H. Brettel et al., 1997, Modified)  
+- (4-1) 1型（P型）2色覚 (H. Brettel et al., 1997, 改変)  
 <img src="https://latex.codecogs.com/gif.latex?\begin{cases}&space;\begin{pmatrix}&space;L_{p}\\&space;M_{p}\\&space;S_{p}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0&space;&&space;1.20800&space;&&space;-0.20797\\&space;0&space;&&space;1&space;&&space;0\\&space;0&space;&&space;0&space;&&space;1&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;S&space;\leq&space;M\\\\&space;\begin{pmatrix}&space;L_{p}\\&space;M_{p}\\&space;S_{p}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0&space;&&space;1.22023&space;&&space;-0.22020\\&space;0&space;&&space;1&space;&&space;0\\&space;0&space;&&space;0&space;&&space;1&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;S&space;&gt;&space;M&space;\end{cases}" title="\begin{cases} \begin{pmatrix} L_{p}\\ M_{p}\\ S_{p} \end{pmatrix} = \begin{pmatrix} 0 & 1.20800 & -0.20797\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } S \leq M\\\\ \begin{pmatrix} L_{p}\\ M_{p}\\ S_{p} \end{pmatrix} = \begin{pmatrix} 0 & 1.22023 & -0.22020\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } S &gt; M \end{cases}" />
 
-- (4-2) for Deuteranope (H. Brettel et al., 1997, Modified)  
+- (4-2) 2型 （D型）2色覚 (H. Brettel et al., 1997, 改変)  
 <img src="https://latex.codecogs.com/gif.latex?\begin{cases}&space;\begin{pmatrix}&space;L_{d}\\&space;M_{d}\\&space;S_{d}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1&space;&&space;0&space;&&space;0\\&space;0.82781&space;&&space;0&space;&&space;0.17216\\&space;0&space;&&space;0&space;&&space;1&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;S&space;\leq&space;L\\\\&space;\begin{pmatrix}&space;L_{d}\\&space;M_{d}\\&space;S_{d}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1&space;&&space;0&space;&&space;0\\&space;0.81951&space;&&space;0&space;&&space;0.18046\\&space;0&space;&&space;0&space;&&space;1&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;S&space;&gt;&space;L&space;\end{cases}" title="\begin{cases} \begin{pmatrix} L_{d}\\ M_{d}\\ S_{d} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0\\ 0.82781 & 0 & 0.17216\\ 0 & 0 & 1 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } S \leq L\\\\ \begin{pmatrix} L_{d}\\ M_{d}\\ S_{d} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0\\ 0.81951 & 0 & 0.18046\\ 0 & 0 & 1 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } S &gt; L \end{cases}" />
 
-- (4-3) for Tritanope (H. Brettel et al., 1997, Modified)  
+- (4-3) 3型（T型）2色覚 (H. Brettel et al., 1997, 改変)  
 <img src="https://latex.codecogs.com/gif.latex?\begin{cases}&space;\begin{pmatrix}&space;L_{t}\\&space;M_{t}\\&space;S_{t}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1&space;&&space;0&space;&&space;0\\&space;0&space;&&space;1&space;&&space;0\\&space;-0.52543&space;&&space;1.52540&space;&&space;0&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;M&space;\leq&space;L\\\\&space;\begin{pmatrix}&space;L_{t}\\&space;M_{t}\\&space;S_{t}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1&space;&&space;0&space;&&space;0\\&space;0&space;&&space;1&space;&&space;0\\&space;-0.87504&space;&&space;1.87503&space;&&space;0&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;M&space;&gt;&space;L&space;\end{cases}" title="\begin{cases} \begin{pmatrix} L_{t}\\ M_{t}\\ S_{t} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0\\ 0 & 1 & 0\\ -0.52543 & 1.52540 & 0 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } M \leq L\\\\ \begin{pmatrix} L_{t}\\ M_{t}\\ S_{t} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0\\ 0 & 1 & 0\\ -0.87504 & 1.87503 & 0 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } M &gt; L \end{cases}" />
 
-(5) Convert color space from LMS to CIEXYZ (Hunt-Pointer-Estevez, Normalized to D65)
+(5) LMSとからCIEXYZへ色空間の変換 (Hunt-Pointer-Estevez, D65照明に正規化)
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1.85995&space;&&space;-1.12939&space;&&space;0.21990&space;\\&space;0.36119&space;&&space;0.63881&space;&&space;0&space;\\&space;0&space;&&space;0&space;&&space;1.08906&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}" title="\begin{pmatrix} X\\ Y\\ Z \end{pmatrix} = \begin{pmatrix} 1.85995 & -1.12939 & 0.21990 \\ 0.36119 & 0.63881 & 0 \\ 0 & 0 & 1.08906 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix}" />
 
-(6) Convert color space from CIEXYZ to sRGB (IEC 61966-2-1)
+(6) CIEXYZからsRGBへ色空間の変換 (IEC 61966-2-1)
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;R_{linear}\\&space;G_{linear}\\&space;B_{linear}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;3.2406&space;&&space;-1.5372&space;&&space;-0.4986\\&space;-0.9689&space;&&space;1.8758&space;&&space;0.0415\\&space;0.0557&space;&&space;-0.2040&space;&&space;1.0570&space;\end{pmatrix}&space;\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}" title="\begin{pmatrix} R_{linear}\\ G_{linear}\\ B_{linear} \end{pmatrix} = \begin{pmatrix} 3.2406 & -1.5372 & -0.4986\\ -0.9689 & 1.8758 & 0.0415\\ 0.0557 & -0.2040 & 1.0570 \end{pmatrix} \begin{pmatrix} X\\ Y\\ Z \end{pmatrix}" />
 
-(7) Convert RGB color from sRGB(linear) to sRGB(gammaed) (IEC 61966-2-1)
+(7) sRGB(linear)からsRGB(gammaed)へのRGB色の変換 (IEC 61966-2-1)
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{matrix}&space;R_{device}=1.055R_{linear}^{\frac{1}{2.4}}-0.055\\\\&space;G_{device}=1.055G_{linear}^{\frac{1}{2.4}}-0.055\\\\&space;B_{device}=1.055B_{linear}^{\frac{1}{2.4}}-0.055&space;\end{matrix}" title="\begin{matrix} R_{device}=1.055R_{linear}^{\frac{1}{2.4}}-0.055\\\\ G_{device}=1.055G_{linear}^{\frac{1}{2.4}}-0.055\\\\ B_{device}=1.055B_{linear}^{\frac{1}{2.4}}-0.055 \end{matrix}" />
