@@ -90,7 +90,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0.40024&space;&&space;0.70760&space;&&space;-0.08081\\&space;-0.22630&space;&&space;1.16532&space;&&space;0.04570\\&space;0&space;&&space;0&space;&&space;0.91822&space;\end{pmatrix}&space;\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}" title="\begin{pmatrix} L\\ M\\ S \end{pmatrix} = \begin{pmatrix} 0.40024 & 0.70760 & -0.08081\\ -0.22630 & 1.16532 & 0.04570\\ 0 & 0 & 0.91822 \end{pmatrix} \begin{pmatrix} X\\ Y\\ Z \end{pmatrix}" />
 
-(4) Color Vision Simulation  
+(4) Color Vision Simulation on LMS color space
+
+Simulated color is calculate as projected orginal color to the color perception half plane.
 
 - (4-1) for Protanope (H. Brettel et al., 1997, Modified)  
 <img src="https://latex.codecogs.com/gif.latex?\begin{cases}&space;\begin{pmatrix}&space;L_{p}\\&space;M_{p}\\&space;S_{p}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0&space;&&space;1.20800&space;&&space;-0.20797\\&space;0&space;&&space;1&space;&&space;0\\&space;0&space;&&space;0&space;&&space;1&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;S&space;\leq&space;M\\\\&space;\begin{pmatrix}&space;L_{p}\\&space;M_{p}\\&space;S_{p}&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;0&space;&&space;1.22023&space;&&space;-0.22020\\&space;0&space;&&space;1&space;&&space;0\\&space;0&space;&&space;0&space;&&space;1&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}&space;&&space;\text{&space;if&space;}&space;S&space;&gt;&space;M&space;\end{cases}" title="\begin{cases} \begin{pmatrix} L_{p}\\ M_{p}\\ S_{p} \end{pmatrix} = \begin{pmatrix} 0 & 1.20800 & -0.20797\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } S \leq M\\\\ \begin{pmatrix} L_{p}\\ M_{p}\\ S_{p} \end{pmatrix} = \begin{pmatrix} 0 & 1.22023 & -0.22020\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix} & \text{ if } S &gt; M \end{cases}" />
@@ -103,7 +105,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 (5) Convert color space from LMS to XYZ (Hunt-Pointer-Estevez, Normalized to D65)
 
-<img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1.85995&space;&&space;-1.12939&space;&&space;0.21990&space;\\&space;0.36119&space;&&space;0.63881&space;&&space;0&space;\\&space;0&space;&&space;0&space;&&space;1.08906&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}" title="\begin{pmatrix} X\\ Y\\ Z \end{pmatrix} = \begin{pmatrix} 1.85995 & -1.12939 & 0.21990 \\ 0.36119 & 0.63881 & 0 \\ 0 & 0 & 1.08906 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix}" /></a>
+<img src="https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;X\\&space;Y\\&space;Z&space;\end{pmatrix}&space;=&space;\begin{pmatrix}&space;1.85995&space;&&space;-1.12939&space;&&space;0.21990&space;\\&space;0.36119&space;&&space;0.63881&space;&&space;0&space;\\&space;0&space;&&space;0&space;&&space;1.08906&space;\end{pmatrix}&space;\begin{pmatrix}&space;L\\&space;M\\&space;S&space;\end{pmatrix}" title="\begin{pmatrix} X\\ Y\\ Z \end{pmatrix} = \begin{pmatrix} 1.85995 & -1.12939 & 0.21990 \\ 0.36119 & 0.63881 & 0 \\ 0 & 0 & 1.08906 \end{pmatrix} \begin{pmatrix} L\\ M\\ S \end{pmatrix}" />
 
 (6) Convert color space from XYZ to sRGB (IEC 61966-2-1)
 
