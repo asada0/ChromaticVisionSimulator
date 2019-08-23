@@ -10,8 +10,8 @@ android {
         applicationId "asada0.android.cvsimulator"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 10
-        versionName "3.01"
+        versionCode 11
+        versionName "3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     applicationVariants.all { variant ->
