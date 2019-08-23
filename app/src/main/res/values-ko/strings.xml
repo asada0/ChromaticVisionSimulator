@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">색각시뮬레이</string>
     <string name="splash_name">색각시뮬레이</string>
-    <string name="app_version">@string/version</string>
+    <string name="app_version">@string/versionName</string>
     <string name="app_description">Color Vision Simulation Tool</string>
-    <string name="app_copyright">Copyright 2018 Kazunori Asada.</string>
+    <string name="app_copyright">Copyright 2019 Kazunori Asada.</string>
     <string name="app_allrights">All rights reserved.</string>
 
     <string name="sType">%s</string>

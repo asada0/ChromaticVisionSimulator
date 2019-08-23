@@ -2,8 +2,8 @@
 //  MainActivity.kt
 //  Chromatic Vision Simulator
 //
-//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2018/08/10.
-//  Copyright 2010-2018 Kazunori Asada. All rights reserved.
+//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2019/08/23.
+//  Copyright 2010-2019 Kazunori Asada. All rights reserved.
 //
 
 package asada0.android.cvsimulator
@@ -20,6 +20,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Point
 import android.media.MediaActionSound
 import android.net.Uri
@@ -27,6 +28,7 @@ import android.opengl.*
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.support.media.ExifInterface
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Size
@@ -46,6 +48,7 @@ import java.io.InputStream
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.popup_image_source.view.*
 import kotlinx.android.synthetic.main.popup_simulation_ratio.view.*
+import kotlin.math.pow
 
 class MainActivity : Activity() {
     private val tag: String = "CVS-MainActivity"
@@ -614,13 +617,14 @@ class MainActivity : Activity() {
                 mIntentData = data
                 val uri = data.data
                 if (uri != null) {
+                    /*
                     // Check file size. If space of image > space of display, load reduced image to bitmap
                     try {
-                        var stream: InputStream = contentResolver.openInputStream(uri)
+                        var stream: InputStream? = contentResolver.openInputStream(uri)
                         val options = BitmapFactory.Options()
                         options.inJustDecodeBounds = true
                         BitmapFactory.decodeStream(stream, null, options)
-                        stream.close()
+                        stream!!.close()
                         val displaySize: Size = getDefaultDisplaySize()
                         val timesSpace = kotlin.math.max((options.outWidth * options.outHeight.toLong()).toFloat() / (displaySize.width * displaySize.height.toLong()), 1.0f)
                         options.inSampleSize = kotlin.math.sqrt(timesSpace).toInt()
@@ -645,6 +649,85 @@ class MainActivity : Activity() {
                     val buffer: ByteBuffer = ByteBuffer.allocate(mFileTextureBitmap!!.byteCount)
                     mFileTextureBitmap!!.copyPixelsToBuffer(buffer)
                     buffer.rewind()
+                    */
+
+                    // Check file size. If space of image > space of display, load reduced image to bitmap
+                    var stream: InputStream?
+                    val options = BitmapFactory.Options()
+                    try {
+                        stream = contentResolver.openInputStream(uri)
+                    } catch (e: Exception) {
+                        mError!!.log(tag, "File read error - File not found(1).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    }
+
+                    try {
+                        options.inJustDecodeBounds = true
+                        BitmapFactory.decodeStream(stream, null, options)
+                    } catch (e: IOException) {
+                        stream.close()
+                        mError!!.log(tag, "File read error - IOException(1).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    } catch (e: SecurityException) {
+                        stream.close()
+                        mError!!.log(tag, "File read error - SecurityException(1).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    } catch (e: OutOfMemoryError) {
+                        stream.close()
+                        mError!!.log(tag, "File read error - OutOfMemoryError(1).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    }
+
+                    val displaySize: Size = getDefaultDisplaySize()
+                    val timesSpace = kotlin.math.max((options.outWidth * options.outHeight.toLong()).toFloat() / (displaySize.width * displaySize.height.toLong()), 1.0f)
+                    val maxSampleN = kotlin.math.ceil(kotlin.math.sqrt(timesSpace.toDouble())).toInt()
+                    var maxSampleLog2 = kotlin.math.ceil(kotlin.math.log2(maxSampleN.toDouble())).toInt()
+                    // mError!!.log(tag, "image (${options.outWidth}, ${options.outHeight}), display(${displaySize.width}, ${displaySize.height}), maxTextureSize($maxTextureSize), sampleMax: ${2.0.pow(maxSampleLog2)}")
+
+                    try {
+                        stream = contentResolver.openInputStream(uri)
+                    } catch (e: Exception) {
+                        mError!!.log(tag, "File read error - File not found(2).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    }
+                    options.inJustDecodeBounds = false
+
+                    try {
+                        options.inSampleSize = 2.0.pow(maxSampleLog2).toInt()
+                        mFileTextureBitmap = BitmapFactory.decodeStream(stream, null, options)
+                        if (mFileTextureBitmap == null) {
+                            mError!!.log(tag, "File read error - Can not read this file.")
+                            mError!!.show(R.string.sFileLoadError)
+                            return
+                        }
+                    } catch (e: IOException) {
+                        stream.close()
+                        mError!!.log(tag, "File read error - IOException(2).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    } catch (e: SecurityException) {
+                        stream.close()
+                        mError!!.log(tag, "File read error - SecurityException(2).")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    } catch (e: OutOfMemoryError) {
+                        stream.close()
+                        mError!!.log(tag, "File read error - OutOfMemoryError, SampleSize: ${2.0.pow(maxSampleLog2).toInt()}")
+                        mError!!.show(R.string.sFileLoadError)
+                        return
+                    }
+
+                    // Exif rotation
+                    val rotateDegree = exifRotateDegree(uri)
+                    if (rotateDegree != 0.0f) {
+                        mFileTextureBitmap = rotateImage(mFileTextureBitmap!!, rotateDegree)
+                    }
+
                     setImageFromFile(mFileTextureBitmap!!)
                     if (!mIsCallFromRestoreInstanceState) {
                         resetZoomAndPan()
@@ -658,6 +741,35 @@ class MainActivity : Activity() {
             }
             mError!!.show(R.string.sFileLoadError)
         }
+    }
+
+    private fun exifRotateDegree(uri: Uri): Float {
+        var orientation = 0
+        try {
+            val exifInterface = ExifInterface(contentResolver.openInputStream(uri)!!)
+            orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        } catch (e: Exception) {
+            mError!!.log(tag, "error in exifRotateDegree, ignored.")
+        }
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90.0f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180.0f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270.0f
+            else -> 0.0f
+        }
+    }
+
+    private fun rotateImage(bitmap: Bitmap, degree: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(degree)
+        var rotatedImage: Bitmap? = null
+        try {
+            rotatedImage = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            bitmap.recycle()
+        } catch (e: Exception) {
+            mError!!.log(tag, "error in rotateImage, ignored.")
+        }
+        return rotatedImage
     }
 
     // Setup Save button
@@ -1221,7 +1333,7 @@ class MainActivity : Activity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        mCPDT = savedInstanceState.getBooleanArray("CPDT")
+        mCPDT = savedInstanceState.getBooleanArray("CPDT")!!
         makeColorVisionTypeList(mCPDT)
         mSimulationRatio = savedInstanceState.getFloat("SimulationRatio")
         mPanX = savedInstanceState.getFloat("PanX")

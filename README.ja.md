@@ -6,7 +6,7 @@
 <img src="http://asada.tukusi.ne.jp/cvsimulator/my_images/cvsimulatoricon.png">
 </p>
 
-##「色のシミュレータ」とは?
+## 「色のシミュレータ」とは?
 
 - 「色のシミュレータ」は、様々な色覚を持つ人の色の見え方をシミュレーションする色覚シミュレーションツールです。
 - スマートデバイスの内蔵カメラまたは画像ファイルから得た画像をリアルタイムに変換し、それぞれの色覚タイプ（2色覚）ではどのように色が見えるのか、シミュレーションを行います。
@@ -68,7 +68,7 @@ Android Studio。
 ## ライセンス
 ### The MIT License (MIT)  
 
-Copyright 2018 Kazunori Asada
+Copyright 2018-2019 Kazunori Asada
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

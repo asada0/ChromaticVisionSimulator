@@ -2,8 +2,8 @@
 //  CVCamera.kt
 //  Chromatic Vision Simulator
 //
-//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2018/08/10.
-//  Copyright 2010-2018 Kazunori Asada. All rights reserved.
+//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2019/08/23.
+//  Copyright 2010-2019 Kazunori Asada. All rights reserved.
 //
 
 package asada0.android.cvsimulator
@@ -76,12 +76,12 @@ class CVCamera(activity: Activity, textureID: Int) {
 
             if (facing != null && facing == targetFacing) {
                 val map: StreamConfigurationMap = chars.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP) as StreamConfigurationMap
-                mSensorOrientation = chars.get(CameraCharacteristics.SENSOR_ORIENTATION)
+                mSensorOrientation = chars.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
                 // Choose camera resolution
                 val sizes: Array<Size> = map.getOutputSizes(SurfaceTexture::class.java)
                 mCameraSize = chooseResolution(sizes)!!
                 // Choose camera frequency
-                val ranges: Array<Range<Int>> = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+                val ranges: Array<Range<Int>> = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)!!
                 mCameraFpsRange = chooseFPS(ranges)!!
 
                 // Start thread
