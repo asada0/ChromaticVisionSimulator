@@ -36,6 +36,8 @@ class CVCamera(activity: Activity, textureID: Int) {
         const val CAMERA_NONE: Int = 0
         const val CAMERA_BACK: Int = 1
         const val CAMERA_FRONT: Int = 2
+        const val MAX_PREVIEW_WIDTH = 1920
+        const val MAX_PREVIEW_HEIGHT = 1080
     }
 
     private var mActivity: Activity? = activity
@@ -217,14 +219,15 @@ class CVCamera(activity: Activity, textureID: Int) {
         if (isCameraDisplayTwisted(supportedSizes[0], displaySize)) {
             displaySize = Size(displaySize.height, displaySize.width)
         }
-
-        val larger: List<Size> = supportedSizes.filter { it.width >= displaySize.width && it.height >= displaySize.height }
-        if (!larger.isEmpty()) {
+        val guaranteed: List<Size> = supportedSizes.filter { it.width <= MAX_PREVIEW_WIDTH && it.height <= MAX_PREVIEW_HEIGHT }
+        val larger: List<Size> = guaranteed.filter { displaySize.width <= it.width && displaySize.height <= it.height }
+        val noLarger: List<Size> = guaranteed.minus(larger)
+        if (larger.isNotEmpty()) {
             // Choose a resolution whose width and height are larger than that of the display and which has a shortest distance between "width difference" and "height difference".
             return larger.minBy { (it.width - displaySize.width) * (it.width - displaySize.width) + (it.height - displaySize.height) * (it.height - displaySize.height) }
         }
         // If either the width or the height is smaller than that of the display, choose a resolution which has a shortest distance between "width difference" and "height difference".
-        return supportedSizes.minBy { (it.width - displaySize.width) * (it.width - displaySize.width) + (it.height - displaySize.height) * (it.height - displaySize.height) }
+        return noLarger.minBy { (it.width - displaySize.width) * (it.width - displaySize.width) + (it.height - displaySize.height) * (it.height - displaySize.height) }
     }
 
     // Choose a Camera FPS
