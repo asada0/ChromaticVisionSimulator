@@ -13,6 +13,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.ContentValues
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -25,9 +26,12 @@ import android.graphics.Point
 import android.media.MediaActionSound
 import android.net.Uri
 import android.opengl.*
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.provider.MediaStore
+import android.support.annotation.RequiresApi
 import android.support.media.ExifInterface
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -37,7 +41,6 @@ import android.view.animation.*
 import android.view.WindowManager
 import android.widget.*
 import android.widget.PopupWindow
-import java.nio.ByteBuffer
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -65,6 +68,7 @@ class MainActivity : Activity() {
         const val CAPTURE_ANIMATION_TIME = 1000L // 1 sec
         const val BUTTON_COLOR_DURATION = 500L // 0.5 sec
         const val JPEG_QUALITY = 60 // 60%
+        const val JPEG_MIME = "image/jpg"
     }
 
     // Private Variables
@@ -247,17 +251,17 @@ class MainActivity : Activity() {
                 mWaitingRationaleCamera = true
                 val afterAlert1: () -> Unit = {
                     mWaitingRationaleCamera = false
-                    if (!mWaitingRationaleStorage && !permissions.isEmpty()) {
+                    if (!mWaitingRationaleStorage && permissions.isNotEmpty()) {
                         // Request CAMERA and/or WRITE_EXTERNAL_STORAGE permission
                         ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CV_PERMISSIONS_CAMERA_STORAGE)
                     }
                     showUI()
                 }
                 AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                        .setMessage(R.string.sCameraReason)
-                        .setPositiveButton(R.string.sDismiss) { _, _ -> afterAlert1() }
-                        .setOnCancelListener { afterAlert1() }
-                        .show()
+                    .setMessage(R.string.sCameraReason)
+                    .setPositiveButton(R.string.sDismiss) { _, _ -> afterAlert1() }
+                    .setOnCancelListener { afterAlert1() }
+                    .show()
             }
             permissions.add(Manifest.permission.CAMERA)
         }
@@ -266,21 +270,21 @@ class MainActivity : Activity() {
                 mWaitingRationaleStorage = true
                 val afterAlert2: () -> Unit = {
                     mWaitingRationaleStorage = false
-                    if (!mWaitingRationaleCamera && !permissions.isEmpty()) {
+                    if (!mWaitingRationaleCamera && permissions.isNotEmpty()) {
                         // Request CAMERA and/or WRITE_EXTERNAL_STORAGE permission
                         ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CV_PERMISSIONS_CAMERA_STORAGE)
                     }
                     showUI()
                 }
                 AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                        .setMessage(R.string.sStorageReason)
-                        .setPositiveButton(R.string.sDismiss) { _, _ -> afterAlert2() }
-                        .setOnCancelListener { afterAlert2() }
-                        .show()
+                    .setMessage(R.string.sStorageReason)
+                    .setPositiveButton(R.string.sDismiss) { _, _ -> afterAlert2() }
+                    .setOnCancelListener { afterAlert2() }
+                    .show()
             }
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-        if (!mWaitingRationaleCamera && !mWaitingRationaleStorage && !permissions.isEmpty()) {
+        if (!mWaitingRationaleCamera && !mWaitingRationaleStorage && permissions.isNotEmpty()) {
             // Request CAMERA and/or WRITE_EXTERNAL_STORAGE permission
             ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CV_PERMISSIONS_CAMERA_STORAGE)
         }
@@ -494,8 +498,8 @@ class MainActivity : Activity() {
         var isDelayRunning = false
         val mDelayHandler = Handler()
         val delayRunnable = Runnable {
-            checkRadioSource(false, false, false)
-            enableRadioSource(true, true, true)
+            checkRadioSource(rear = false, front = false, file = false)
+            enableRadioSource(rear = true, front = true, file = true)
             if (mPopupImageSource!!.isShowing) {
                 mPopupImageSource!!.dismiss()
             }
@@ -505,12 +509,12 @@ class MainActivity : Activity() {
         mRadioRearCamera = mPopupImageSourceLayout!!.radio_rear
         mRadioRearCamera!!.setOnClickListener {
             if (!isDelayRunning) {
-                checkRadioSource(true, false, false)
-                enableRadioSource(true, false, false)
+                checkRadioSource(rear = true, front = false, file = false)
+                enableRadioSource(rear = true, front = false, file = false)
                 if (mHasCameraPermission) {
                     radioRearCameraPushed()
                 } else {
-                    requestPermission(true, false) { radioRearCameraPushed() }
+                    requestPermission(fCamera = true, fStorage = false) { radioRearCameraPushed() }
                 }
                 // keep showing popup for 0.5sec
                 isDelayRunning = true
@@ -522,12 +526,12 @@ class MainActivity : Activity() {
         mRadioFrontCamera = mPopupImageSourceLayout!!.radio_front
         mRadioFrontCamera!!.setOnClickListener {
             if (!isDelayRunning) {
-                checkRadioSource(false, true, false)
-                enableRadioSource(false, true, false)
+                checkRadioSource(rear = false, front = true, file = false)
+                enableRadioSource(rear = false, front = true, file = false)
                 if (mHasCameraPermission) {
                     radioFrontCameraPushed()
                 } else {
-                    requestPermission(true, false) { radioFrontCameraPushed() }
+                    requestPermission(fCamera = true, fStorage = false) { radioFrontCameraPushed() }
                 }
                 // keep showing popup for 0.5sec
                 isDelayRunning = true
@@ -539,12 +543,12 @@ class MainActivity : Activity() {
         mRadioFile = mPopupImageSourceLayout!!.radio_file
         mRadioFile!!.setOnClickListener {
             if (!isDelayRunning) {
-                checkRadioSource(false, false, true)
-                enableRadioSource(false, false, true)
+                checkRadioSource(rear = false, front = false, file = true)
+                enableRadioSource(rear = false, front = false, file = true)
                 if (mHasStoragePermission) {
                     radioFilePushed()
                 } else {
-                    requestPermission(false, true) { radioFilePushed() }
+                    requestPermission(fCamera = false, fStorage = true) { radioFilePushed() }
                 }
                 // keep showing popup for 0.5sec
                 isDelayRunning = true
@@ -553,7 +557,7 @@ class MainActivity : Activity() {
             restartUITimer()
         }
         // Set enable/disable of the image source buttons depending on the camera support status of the device,
-        enableRadioSource(true, true, true)
+        enableRadioSource(rear = true, front = true, file = true)
     }
 
     private fun checkRadioSource(rear: Boolean, front: Boolean, file: Boolean) {
@@ -666,17 +670,17 @@ class MainActivity : Activity() {
                         options.inJustDecodeBounds = true
                         BitmapFactory.decodeStream(stream, null, options)
                     } catch (e: IOException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - IOException(1).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: SecurityException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - SecurityException(1).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: OutOfMemoryError) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - OutOfMemoryError(1).")
                         mError!!.show(R.string.sFileLoadError)
                         return
@@ -685,7 +689,7 @@ class MainActivity : Activity() {
                     val displaySize: Size = getDefaultDisplaySize()
                     val timesSpace = kotlin.math.max((options.outWidth * options.outHeight.toLong()).toFloat() / (displaySize.width * displaySize.height.toLong()), 1.0f)
                     val maxSampleN = kotlin.math.ceil(kotlin.math.sqrt(timesSpace.toDouble())).toInt()
-                    var maxSampleLog2 = kotlin.math.ceil(kotlin.math.log2(maxSampleN.toDouble())).toInt()
+                    val maxSampleLog2 = kotlin.math.ceil(kotlin.math.log2(maxSampleN.toDouble())).toInt()
                     // mError!!.log(tag, "image (${options.outWidth}, ${options.outHeight}), display(${displaySize.width}, ${displaySize.height}), maxTextureSize($maxTextureSize), sampleMax: ${2.0.pow(maxSampleLog2)}")
 
                     try {
@@ -706,17 +710,17 @@ class MainActivity : Activity() {
                             return
                         }
                     } catch (e: IOException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - IOException(2).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: SecurityException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - SecurityException(2).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: OutOfMemoryError) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - OutOfMemoryError, SampleSize: ${2.0.pow(maxSampleLog2).toInt()}")
                         mError!!.show(R.string.sFileLoadError)
                         return
@@ -890,10 +894,14 @@ class MainActivity : Activity() {
                     enableAllButton(true)
                     return
                 }
-                if (mHasStoragePermission) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     realSave(bitmap)
                 } else {
-                    requestPermission(false, true) { realSave(bitmap) }
+                    if (mHasStoragePermission) {
+                        realSave(bitmap)
+                    } else {
+                        requestPermission(fCamera = false, fStorage = true) { realSave(bitmap) }
+                    }
                 }
             }
         }
@@ -932,7 +940,16 @@ class MainActivity : Activity() {
             mError!!.show(R.string.sFileSaveError)
             return false
         }
+        // Determination of file name
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.US)
+        val fileName = "cvs_${dateFormat.format(Date())}.jpg"
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            saveImageAboveV30(bitmap, fileName)
+        } else {
+            saveImageUnderV30(bitmap, fileName)
+        }
 
+        /*
         val storageDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         if (!storageDir.isDirectory) {
             storageDir.mkdir()
@@ -970,6 +987,82 @@ class MainActivity : Activity() {
 
         mError!!.log(tag,"Saved \"$fileName\".")
         return true
+        */
+    }
+
+    private fun saveImageUnderV30(bitmap: Bitmap?, fileName: String): Boolean {
+        val storageDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        if (!storageDir.isDirectory) {
+            storageDir.mkdir()
+            if (!storageDir.isDirectory) {
+                mError!!.log(tag, "File save error - Cannot make directory.")
+                return false
+            }
+        }
+        val file = File(storageDir, fileName)
+        try {
+            val fos = FileOutputStream(file)
+            if (!bitmap!!.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fos)) {
+                mError!!.log(tag, "File save error - bitmap.compress failed.")
+                return false
+            }
+            fos.close()
+        } catch (e: FileNotFoundException) {
+            mError!!.log(tag, "File save error - FileNotFoundException. Maybe don't have permission.")
+            return false
+        } catch (e: SecurityException) {
+            mError!!.log(tag, "File save error - SecurityException")
+            return false
+        } catch (e: IOException) {
+            mError!!.log(tag, "File save error - IOException.")
+            return false
+        }
+        // Request to register to gallery (MediaScan)
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)))
+
+        mError!!.log(tag,"Saved \"$fileName\".")
+        return true
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun saveImageAboveV30(bitmap: Bitmap?, fileName: String): Boolean {
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, JPEG_MIME)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM)
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val uri = contentResolver.insert(collection, values)
+        if (uri == null) {
+            mError!!.log(tag, "File save error - uri == null.")
+            mError!!.show(R.string.sFileSaveError)
+            return false
+        }
+        try {
+            contentResolver.openFileDescriptor(uri, "w", null).use {
+                FileOutputStream(it!!.fileDescriptor).use { outputStream ->
+                    bitmap!!.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, outputStream)
+                }
+            }
+        } catch (e: FileNotFoundException) {
+            mError!!.log(tag, "File save error - FileNotFoundException.")
+            mError!!.show(R.string.sFileSaveError)
+            uri.let { orphanUri ->
+                contentResolver.delete(orphanUri, null, null)
+            }
+            return false
+
+        }
+        values.clear()
+        values.put(MediaStore.Images.Media.IS_PENDING, 0)
+        contentResolver.update(uri, values, null, null)
+
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
+        mError!!.log(tag,"Saved \"$fileName\".")
+
+        return true
     }
 
     private fun fileSaveAnimation(bitmap: Bitmap?) {
@@ -986,9 +1079,9 @@ class MainActivity : Activity() {
         val location = intArrayOf(0, 0)
         button_save.getLocationInWindow(location)
         val animation = ScaleAnimation(
-                1.0f, 0.0f, 1.0f, 0.0f,
-                Animation.ABSOLUTE, location[0] + button_save.measuredWidth / 2.0f,
-                Animation.ABSOLUTE, (location[1] + button_save.measuredHeight / 2.0f))
+            1.0f, 0.0f, 1.0f, 0.0f,
+            Animation.ABSOLUTE, location[0] + button_save.measuredWidth / 2.0f,
+            Animation.ABSOLUTE, (location[1] + button_save.measuredHeight / 2.0f))
         animation.duration = CAPTURE_ANIMATION_TIME
         animation.repeatCount = 0
         animation.fillAfter = true
@@ -1009,27 +1102,27 @@ class MainActivity : Activity() {
         // Hide Tool Panel and Status when there is no touch for 10 seconds
         mUITimerHandler = Handler()
         mUITimerRunnable = Runnable { hideUI() }
-        mUITimerHandler!!.postDelayed(mUITimerRunnable, PANEL_HIDDEN_INTERVAL)
+        mUITimerHandler!!.postDelayed(mUITimerRunnable!!, PANEL_HIDDEN_INTERVAL)
 
         // Update status on every one second
         mStatusTimerHandler = Handler()
         mStatusTimerRunnable = Runnable {
             updateTextLabels()
-            mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable, STATUS_INTERVAL)
+            mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable!!, STATUS_INTERVAL)
         }
-        mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable, STATUS_INTERVAL)
+        mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable!!, STATUS_INTERVAL)
     }
 
     private fun restartUITimer() {
         mUITimerHandler ?: return
         mUITimerRunnable ?: return
-        mUITimerHandler!!.removeCallbacks(mUITimerRunnable)
-        mUITimerHandler!!.postDelayed(mUITimerRunnable, PANEL_HIDDEN_INTERVAL)
+        mUITimerHandler!!.removeCallbacks(mUITimerRunnable!!)
+        mUITimerHandler!!.postDelayed(mUITimerRunnable!!, PANEL_HIDDEN_INTERVAL)
     }
 
     private fun releaseTimers() {
-        mUITimerHandler!!.removeCallbacks(mUITimerRunnable)
-        mStatusTimerHandler!!.removeCallbacks(mStatusTimerRunnable)
+        mUITimerHandler!!.removeCallbacks(mUITimerRunnable!!)
+        mStatusTimerHandler!!.removeCallbacks(mStatusTimerRunnable!!)
     }
 
     private fun setupSound() {
@@ -1357,7 +1450,7 @@ class MainActivity : Activity() {
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         resetPan()
         if (mIsImageFromFile) {
