@@ -2,23 +2,30 @@
 //  CVGLRenderer.kt
 //  Chromatic Vision Simulator
 //
-//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2018/08/10.
-//  Copyright 2010-2018 Kazunori Asada. All rights reserved.
+//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2023/10/08.
+//  Copyright 2010-2023 Kazunori Asada. All rights reserved.
 //
 
 package asada0.android.cvsimulator
+
+//import kotlinx.android.synthetic.main.activity_main.*
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.Size
 import android.view.Surface
 import android.view.WindowManager
-import kotlinx.android.synthetic.main.activity_main.*
+import asada0.android.cvsimulator.databinding.ActivityMainBinding
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -109,6 +116,8 @@ open class CVGLRenderer(context: Context, activity: Activity) : GLSurfaceView.Re
 
     private val divPortrait = arrayOf(Pair(1, 1), Pair(1, 2), Pair(1, 3), Pair(2, 2))
     private val divLandscape = arrayOf(Pair(1, 1), Pair(2, 1), Pair(3, 1), Pair(2, 2))
+
+    private lateinit var mBinding: ActivityMainBinding
 
     init {
         init()
@@ -260,7 +269,8 @@ open class CVGLRenderer(context: Context, activity: Activity) : GLSurfaceView.Re
     }
 
     private fun getDefaultDisplaySize(): Size {
-        return(Size(mActivity!!.gl_surface_view_camera.width, mActivity!!.gl_surface_view_camera.height))
+        val glView: GLSurfaceView = mActivity!!.findViewById(R.id.gl_surface_view_camera)
+        return(Size(glView.width, glView.height))
     }
 
     private fun isSourceDisplayTwisted(): Boolean {

@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cvsimulator-android-3.0.iml" filepath="$PROJECT_DIR$/cvsimulator-android-3.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cvsimulator-android-3.1.iml" filepath="$PROJECT_DIR$/cvsimulator-android-3.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/cvsimulator-android-3.1.app.unitTest.iml" />
     </modules>
   </component>
 </project>

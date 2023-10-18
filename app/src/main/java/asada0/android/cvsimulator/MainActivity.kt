@@ -2,8 +2,8 @@
 //  MainActivity.kt
 //  Chromatic Vision Simulator
 //
-//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2019/08/23.
-//  Copyright 2010-2019 Kazunori Asada. All rights reserved.
+//  Created by Kazunori Asada, Masataka Matsuda and Hirofumi Ukawa on 2023/10/08.
+//  Copyright 2010-2023 Kazunori Asada. All rights reserved.
 //
 
 package asada0.android.cvsimulator
@@ -13,6 +13,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.ContentValues
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -25,19 +26,22 @@ import android.graphics.Point
 import android.media.MediaActionSound
 import android.net.Uri
 import android.opengl.*
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.support.media.ExifInterface
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import android.provider.MediaStore
 import android.util.Size
 import android.view.*
 import android.view.animation.*
-import android.view.WindowManager
 import android.widget.*
 import android.widget.PopupWindow
-import java.nio.ByteBuffer
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.exifinterface.media.ExifInterface
+import asada0.android.cvsimulator.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -45,9 +49,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.io.InputStream
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.popup_image_source.view.*
-import kotlinx.android.synthetic.main.popup_simulation_ratio.view.*
 import kotlin.math.pow
 
 class MainActivity : Activity() {
@@ -65,6 +66,7 @@ class MainActivity : Activity() {
         const val CAPTURE_ANIMATION_TIME = 1000L // 1 sec
         const val BUTTON_COLOR_DURATION = 500L // 0.5 sec
         const val JPEG_QUALITY = 60 // 60%
+        const val JPEG_MIME = "image/jpg"
     }
 
     // Private Variables
@@ -156,19 +158,23 @@ class MainActivity : Activity() {
             mRendererCamera!!.mIsImageFromFile = yn
             mRendererFile!!.mIsImageFromFile = yn
         }
+    private lateinit var mBinding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-
         // Start
         init()
     }
 
     // App Initialization after permission check
     private fun init() {
-        setContentView(R.layout.activity_main)
+
+        val layoutInflater = LayoutInflater.from(applicationContext)
+        mBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mBinding.root)
+        //setContentView(R.layout.activity_main)
 
         // Setup mError
         mError = CVError(this)
@@ -223,7 +229,7 @@ class MainActivity : Activity() {
     }
 
     private fun hasRearCamera(): Boolean {
-        return this.applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
+        return this.applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
     }
 
     private fun hasFrontCamera(): Boolean {
@@ -247,7 +253,7 @@ class MainActivity : Activity() {
                 mWaitingRationaleCamera = true
                 val afterAlert1: () -> Unit = {
                     mWaitingRationaleCamera = false
-                    if (!mWaitingRationaleStorage && !permissions.isEmpty()) {
+                    if (!mWaitingRationaleStorage && permissions.isNotEmpty()) {
                         // Request CAMERA and/or WRITE_EXTERNAL_STORAGE permission
                         ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CV_PERMISSIONS_CAMERA_STORAGE)
                     }
@@ -266,7 +272,7 @@ class MainActivity : Activity() {
                 mWaitingRationaleStorage = true
                 val afterAlert2: () -> Unit = {
                     mWaitingRationaleStorage = false
-                    if (!mWaitingRationaleCamera && !permissions.isEmpty()) {
+                    if (!mWaitingRationaleCamera && permissions.isNotEmpty()) {
                         // Request CAMERA and/or WRITE_EXTERNAL_STORAGE permission
                         ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CV_PERMISSIONS_CAMERA_STORAGE)
                     }
@@ -280,7 +286,7 @@ class MainActivity : Activity() {
             }
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-        if (!mWaitingRationaleCamera && !mWaitingRationaleStorage && !permissions.isEmpty()) {
+        if (!mWaitingRationaleCamera && !mWaitingRationaleStorage && permissions.isNotEmpty()) {
             // Request CAMERA and/or WRITE_EXTERNAL_STORAGE permission
             ActivityCompat.requestPermissions(this, permissions.toTypedArray(), CV_PERMISSIONS_CAMERA_STORAGE)
         }
@@ -314,7 +320,7 @@ class MainActivity : Activity() {
 
     private fun initViewAndRendererCamera() {
         // Image from Camera
-        mViewCamera = gl_surface_view_camera
+        mViewCamera = mBinding.glSurfaceViewCamera
         mViewCamera!!.setEGLContextClientVersion(2)
         mRendererCamera = CVGLRendererCamera(this.applicationContext, this)
         mViewCamera!!.setRenderer(mRendererCamera)
@@ -338,7 +344,7 @@ class MainActivity : Activity() {
 
     private fun initViewAndRendererFile() {
         // Image from File
-        mViewFile = gl_surface_view_file
+        mViewFile = mBinding.glSurfaceViewFile
         mViewFile!!.setEGLContextClientVersion(2)
         mRendererFile = CVGLRendererFile(this.applicationContext, this)
         mViewFile!!.setRenderer(mRendererFile)
@@ -347,7 +353,7 @@ class MainActivity : Activity() {
 
     // Setup Color Vision Type radio buttons
     private fun setupColorVisionTypeRadios() {
-        mRadioTypesViews = arrayOf(radio_c, radio_p, radio_d, radio_t)
+        mRadioTypesViews = arrayOf(mBinding.radioC, mBinding.radioP, mBinding.radioD, mBinding.radioT)
 
         // Push Color Vision Type button ("C", "P", "D", "T")
         mRadioTypesViews.forEach { it ->
@@ -355,7 +361,7 @@ class MainActivity : Activity() {
             it.setOnClickListener { radioColorVisionTypeHandler(it as RadioButton) }
             it.setOnLongClickListener { radioColorVisionTypeLongHandler(it as RadioButton) }
         }
-        radio_c.isChecked = true
+        mBinding.radioC.isChecked = true
     }
 
     private fun radioColorVisionTypeHandler(pushedButton: RadioButton) {
@@ -376,8 +382,8 @@ class MainActivity : Activity() {
 
         resetPan()
         // Disable Appear Simulation Ratio Slider button and badge when only "C" is pushed
-        button_simulation_ratio.isEnabled = !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
-        badge_number.visibility = if (button_simulation_ratio.isEnabled && (mSimulationRatio < 1.0f)) View.VISIBLE else View.INVISIBLE
+        mBinding.buttonSimulationRatio.isEnabled = !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
+        mBinding.badgeNumber.visibility = if (mBinding.buttonSimulationRatio.isEnabled && (mSimulationRatio < 1.0f)) View.VISIBLE else View.INVISIBLE
         mZoom = adjustZoom(mZoom)
         restartUITimer()
     }
@@ -398,8 +404,8 @@ class MainActivity : Activity() {
 
         resetPan()
         // Disable Appear Simulation Ratio Slider button and badge when only "C" is pushed
-        button_simulation_ratio.isEnabled = !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
-        badge_number.visibility = if (button_simulation_ratio.isEnabled && (mSimulationRatio < 1.0f)) View.VISIBLE else View.INVISIBLE
+        mBinding.buttonSimulationRatio.isEnabled = !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
+        mBinding.badgeNumber.visibility = if (mBinding.buttonSimulationRatio.isEnabled && (mSimulationRatio < 1.0f)) View.VISIBLE else View.INVISIBLE
         mZoom = adjustZoom(mZoom)
         restartUITimer()
         return true
@@ -420,27 +426,32 @@ class MainActivity : Activity() {
 
     // Setup Simulation Ratio Popup and Simulation Ratio Slider
     private fun setupSimulationRatioButton() {
-        button_simulation_ratio.isEnabled = false
+        mBinding.buttonSimulationRatio.isEnabled = false
         mPopupSimulationRatio = PopupWindow()
         val view: View = layoutInflater.inflate(R.layout.popup_simulation_ratio, FrameLayout(this))
         mPopupSimulationRatio!!.contentView = view
         mPopupSimulationRatio!!.width = RelativeLayout.LayoutParams.WRAP_CONTENT
         mPopupSimulationRatio!!.height = RelativeLayout.LayoutParams.WRAP_CONTENT
-        mPopupSimulationRatio!!.setBackgroundDrawable(resources.getDrawable(R.drawable.clear, null))
+        mPopupSimulationRatio!!.setBackgroundDrawable(
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.clear,
+                null
+            )
+        )
         mPopupSimulationRatio!!.isOutsideTouchable = true // Closes the popup when touch outside
         mPopupSimulationRatio!!.isFocusable = true
-
-        mSliderSimulationRatio = view.slider_ratio
+        mSliderSimulationRatio = view.findViewById(R.id.slider_ratio)
 
         // Push Appear Simulation Ratio Slider button
-        button_simulation_ratio.setOnClickListener {
+        mBinding.buttonSimulationRatio.setOnClickListener {
             // set slider progress
             mSliderSimulationRatio!!.progress = (mSimulationRatio * 100).toInt()
 
             // Show anchored to button
             val popupView: View = mPopupSimulationRatio!!.contentView
             popupView.measure(0, 0)
-            mPopupSimulationRatio!!.showAsDropDown(it, (it.width - popupView.measuredWidth) / 2, -(tool_panel.measuredHeight + popupView.measuredHeight))
+            mPopupSimulationRatio!!.showAsDropDown(it, (it.width - popupView.measuredWidth) / 2, -(mBinding.toolPanel.measuredHeight + popupView.measuredHeight))
 
             restartUITimer()
         }
@@ -453,13 +464,13 @@ class MainActivity : Activity() {
                 mSimulationRatio = ratio100.toFloat() / 100
             }
             override fun onStartTrackingTouch(bar: SeekBar) {
-                badge_number.visibility = View.VISIBLE
+                mBinding.badgeNumber.visibility = View.VISIBLE
                 restartUITimer()
             }
             override fun onStopTrackingTouch(bar: SeekBar) {
-                badge_number.text = (mSimulationRatio * 100).toInt().toString()
+                mBinding.badgeNumber.text = (mSimulationRatio * 100).toInt().toString()
                 if (mSimulationRatio >= 1.0f) {
-                    badge_number.visibility = View.INVISIBLE
+                    mBinding.badgeNumber.visibility = View.INVISIBLE
                 }
                 updateTextLabels()
                 restartUITimer()
@@ -480,11 +491,11 @@ class MainActivity : Activity() {
         mPopupImageSource!!.isFocusable = true
 
         // Push Appear Image Source Popup button
-        button_image_source.setOnClickListener {
+        mBinding.buttonImageSource.setOnClickListener {
             val popupView: View = mPopupImageSource!!.contentView
             popupView.measure(0, 0)
             // mPopupImageSource!!.showAsDropDown(it, (it.width - popupView.measuredWidth) / 2, -(tool_panel.measuredHeight + popupView.measuredHeight))
-            mPopupImageSource!!.showAsDropDown(it, (it.width - popupView.measuredWidth) / 2, -(tool_panel.measuredHeight + popupView.measuredHeight))
+            mPopupImageSource!!.showAsDropDown(it, (it.width - popupView.measuredWidth) / 2, -(mBinding.toolPanel.measuredHeight + popupView.measuredHeight))
             restartUITimer()
         }
     }
@@ -494,23 +505,23 @@ class MainActivity : Activity() {
         var isDelayRunning = false
         val mDelayHandler = Handler()
         val delayRunnable = Runnable {
-            checkRadioSource(false, false, false)
-            enableRadioSource(true, true, true)
+            checkRadioSource(rear = false, front = false, file = false)
+            enableRadioSource(rear = true, front = true, file = true)
             if (mPopupImageSource!!.isShowing) {
                 mPopupImageSource!!.dismiss()
             }
             isDelayRunning = false
         }
 
-        mRadioRearCamera = mPopupImageSourceLayout!!.radio_rear
+        mRadioRearCamera = mPopupImageSourceLayout!!.findViewById(R.id.radio_rear)
         mRadioRearCamera!!.setOnClickListener {
             if (!isDelayRunning) {
-                checkRadioSource(true, false, false)
-                enableRadioSource(true, false, false)
+                checkRadioSource(rear = true, front = false, file = false)
+                enableRadioSource(rear = true, front = false, file = false)
                 if (mHasCameraPermission) {
                     radioRearCameraPushed()
                 } else {
-                    requestPermission(true, false) { radioRearCameraPushed() }
+                    requestPermission(fCamera = true, fStorage = false) { radioRearCameraPushed() }
                 }
                 // keep showing popup for 0.5sec
                 isDelayRunning = true
@@ -519,15 +530,15 @@ class MainActivity : Activity() {
             restartUITimer()
         }
 
-        mRadioFrontCamera = mPopupImageSourceLayout!!.radio_front
+        mRadioFrontCamera = mPopupImageSourceLayout!!.findViewById(R.id.radio_front)
         mRadioFrontCamera!!.setOnClickListener {
             if (!isDelayRunning) {
-                checkRadioSource(false, true, false)
-                enableRadioSource(false, true, false)
+                checkRadioSource(rear = false, front = true, file = false)
+                enableRadioSource(rear = false, front = true, file = false)
                 if (mHasCameraPermission) {
                     radioFrontCameraPushed()
                 } else {
-                    requestPermission(true, false) { radioFrontCameraPushed() }
+                    requestPermission(fCamera = true, fStorage = false) { radioFrontCameraPushed() }
                 }
                 // keep showing popup for 0.5sec
                 isDelayRunning = true
@@ -536,15 +547,15 @@ class MainActivity : Activity() {
             restartUITimer()
         }
 
-        mRadioFile = mPopupImageSourceLayout!!.radio_file
+        mRadioFile = mPopupImageSourceLayout!!.findViewById(R.id.radio_file)
         mRadioFile!!.setOnClickListener {
             if (!isDelayRunning) {
-                checkRadioSource(false, false, true)
-                enableRadioSource(false, false, true)
+                checkRadioSource(rear = false, front = false, file = true)
+                enableRadioSource(rear = false, front = false, file = true)
                 if (mHasStoragePermission) {
                     radioFilePushed()
                 } else {
-                    requestPermission(false, true) { radioFilePushed() }
+                    requestPermission(fCamera = false, fStorage = true) { radioFilePushed() }
                 }
                 // keep showing popup for 0.5sec
                 isDelayRunning = true
@@ -553,7 +564,7 @@ class MainActivity : Activity() {
             restartUITimer()
         }
         // Set enable/disable of the image source buttons depending on the camera support status of the device,
-        enableRadioSource(true, true, true)
+        enableRadioSource(rear = true, front = true, file = true)
     }
 
     private fun checkRadioSource(rear: Boolean, front: Boolean, file: Boolean) {
@@ -666,17 +677,17 @@ class MainActivity : Activity() {
                         options.inJustDecodeBounds = true
                         BitmapFactory.decodeStream(stream, null, options)
                     } catch (e: IOException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - IOException(1).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: SecurityException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - SecurityException(1).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: OutOfMemoryError) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - OutOfMemoryError(1).")
                         mError!!.show(R.string.sFileLoadError)
                         return
@@ -685,7 +696,7 @@ class MainActivity : Activity() {
                     val displaySize: Size = getDefaultDisplaySize()
                     val timesSpace = kotlin.math.max((options.outWidth * options.outHeight.toLong()).toFloat() / (displaySize.width * displaySize.height.toLong()), 1.0f)
                     val maxSampleN = kotlin.math.ceil(kotlin.math.sqrt(timesSpace.toDouble())).toInt()
-                    var maxSampleLog2 = kotlin.math.ceil(kotlin.math.log2(maxSampleN.toDouble())).toInt()
+                    val maxSampleLog2 = kotlin.math.ceil(kotlin.math.log2(maxSampleN.toDouble())).toInt()
                     // mError!!.log(tag, "image (${options.outWidth}, ${options.outHeight}), display(${displaySize.width}, ${displaySize.height}), maxTextureSize($maxTextureSize), sampleMax: ${2.0.pow(maxSampleLog2)}")
 
                     try {
@@ -706,17 +717,17 @@ class MainActivity : Activity() {
                             return
                         }
                     } catch (e: IOException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - IOException(2).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: SecurityException) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - SecurityException(2).")
                         mError!!.show(R.string.sFileLoadError)
                         return
                     } catch (e: OutOfMemoryError) {
-                        stream.close()
+                        stream!!.close()
                         mError!!.log(tag, "File read error - OutOfMemoryError, SampleSize: ${2.0.pow(maxSampleLog2).toInt()}")
                         mError!!.show(R.string.sFileLoadError)
                         return
@@ -775,7 +786,7 @@ class MainActivity : Activity() {
     // Setup Save button
     private fun setupSaveButton() {
         // Push Save button
-        button_save.setOnClickListener {
+        mBinding.buttonSave.setOnClickListener {
             if (!mIsImageFromFile) { // camera
                 mRendererCamera!!.captureRequest()
             } else { // file
@@ -791,9 +802,9 @@ class MainActivity : Activity() {
         mRadioTypesViews.forEach {
             it!!.isEnabled = enable
         }
-        button_simulation_ratio.isEnabled = enable && !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
-        button_image_source.isEnabled = enable
-        button_save.isEnabled = enable
+        mBinding.buttonSimulationRatio.isEnabled = enable && !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
+        mBinding.buttonImageSource.isEnabled = enable
+        mBinding.buttonSave.isEnabled = enable
     }
 
     private fun setupGestures() {
@@ -832,16 +843,16 @@ class MainActivity : Activity() {
     }
 
     private fun setupAnimation() {
-        mAnimeHideToolPanel = TranslateAnimation(0.0f, 0.0f, 0.0f, tool_panel.layoutParams.height.toFloat())
+        mAnimeHideToolPanel = TranslateAnimation(0.0f, 0.0f, 0.0f, mBinding.toolPanel.layoutParams.height.toFloat())
         mAnimeHideToolPanel!!.duration = PANEL_HIDDEN_DURATION
-        mAnimeShowToolPanel = TranslateAnimation(0.0f, 0.0f, tool_panel.layoutParams.height.toFloat(), 0.0f)
+        mAnimeShowToolPanel = TranslateAnimation(0.0f, 0.0f, mBinding.toolPanel.layoutParams.height.toFloat(), 0.0f)
         mAnimeShowToolPanel!!.duration = PANEL_HIDDEN_DURATION
     }
 
     private fun showUI() {
         if (!mIsShowingUI) {
-            tool_panel.startAnimation(mAnimeShowToolPanel)
-            tool_panel!!.visibility = View.VISIBLE
+            mBinding.toolPanel.startAnimation(mAnimeShowToolPanel)
+            mBinding.toolPanel!!.visibility = View.VISIBLE
             mColorVisionTypeList.forEachIndexed { index, _ ->
                 mLabelTypes[index]!!.visibility = View.VISIBLE
             }
@@ -854,8 +865,8 @@ class MainActivity : Activity() {
 
     private fun hideUI() {
         if (mIsShowingUI) {
-            tool_panel.startAnimation(mAnimeHideToolPanel)
-            tool_panel!!.visibility = View.INVISIBLE
+            mBinding.toolPanel.startAnimation(mAnimeHideToolPanel)
+            mBinding.toolPanel!!.visibility = View.INVISIBLE
             closePopups()
             mLabelTypes.forEach { it!!.visibility = View.INVISIBLE  }
             mLabelZoom!!.visibility = View.INVISIBLE
@@ -869,7 +880,7 @@ class MainActivity : Activity() {
             it!!.setTextColor(Color.WHITE)
             it.setShadowLayer(5.0f, 2.0f, 2.0f, Color.BLACK)
             it.visibility = View.INVISIBLE
-            frame_layout.addView(it, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+            mBinding.frameLayout.addView(it, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         }
         mLabelZoom = TextView(this)
         mLabelZoom!!.setTextColor(Color.WHITE)
@@ -877,7 +888,7 @@ class MainActivity : Activity() {
         mLabelZoom!!.text = getString(R.string.sZoom).format((mZoom * 100).toInt())
         mLabelZoom!!.visibility = View.INVISIBLE
 
-        frame_layout.addView(mLabelZoom, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        mBinding.frameLayout.addView(mLabelZoom, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
     }
 
     private fun setupFileSaveIntent() {
@@ -890,10 +901,14 @@ class MainActivity : Activity() {
                     enableAllButton(true)
                     return
                 }
-                if (mHasStoragePermission) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     realSave(bitmap)
                 } else {
-                    requestPermission(false, true) { realSave(bitmap) }
+                    if (mHasStoragePermission) {
+                        realSave(bitmap)
+                    } else {
+                        requestPermission(fCamera = false, fStorage = true) { realSave(bitmap) }
+                    }
                 }
             }
         }
@@ -932,7 +947,16 @@ class MainActivity : Activity() {
             mError!!.show(R.string.sFileSaveError)
             return false
         }
+        // Determination of file name
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.US)
+        val fileName = "cvs_${dateFormat.format(Date())}.jpg"
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            saveImageAboveV30(bitmap, fileName)
+        } else {
+            saveImageUnderV30(bitmap, fileName)
+        }
 
+        /*
         val storageDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         if (!storageDir.isDirectory) {
             storageDir.mkdir()
@@ -970,6 +994,82 @@ class MainActivity : Activity() {
 
         mError!!.log(tag,"Saved \"$fileName\".")
         return true
+        */
+    }
+
+    private fun saveImageUnderV30(bitmap: Bitmap?, fileName: String): Boolean {
+        val storageDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        if (!storageDir.isDirectory) {
+            storageDir.mkdir()
+            if (!storageDir.isDirectory) {
+                mError!!.log(tag, "File save error - Cannot make directory.")
+                return false
+            }
+        }
+        val file = File(storageDir, fileName)
+        try {
+            val fos = FileOutputStream(file)
+            if (!bitmap!!.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fos)) {
+                mError!!.log(tag, "File save error - bitmap.compress failed.")
+                return false
+            }
+            fos.close()
+        } catch (e: FileNotFoundException) {
+            mError!!.log(tag, "File save error - FileNotFoundException. Maybe don't have permission.")
+            return false
+        } catch (e: SecurityException) {
+            mError!!.log(tag, "File save error - SecurityException")
+            return false
+        } catch (e: IOException) {
+            mError!!.log(tag, "File save error - IOException.")
+            return false
+        }
+        // Request to register to gallery (MediaScan)
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)))
+
+        mError!!.log(tag,"Saved \"$fileName\".")
+        return true
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun saveImageAboveV30(bitmap: Bitmap?, fileName: String): Boolean {
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, JPEG_MIME)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM)
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val uri = contentResolver.insert(collection, values)
+        if (uri == null) {
+            mError!!.log(tag, "File save error - uri == null.")
+            mError!!.show(R.string.sFileSaveError)
+            return false
+        }
+        try {
+            contentResolver.openFileDescriptor(uri, "w", null).use {
+                FileOutputStream(it!!.fileDescriptor).use { outputStream ->
+                    bitmap!!.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, outputStream)
+                }
+            }
+        } catch (e: FileNotFoundException) {
+            mError!!.log(tag, "File save error - FileNotFoundException.")
+            mError!!.show(R.string.sFileSaveError)
+            uri.let { orphanUri ->
+                contentResolver.delete(orphanUri, null, null)
+            }
+            return false
+
+        }
+        values.clear()
+        values.put(MediaStore.Images.Media.IS_PENDING, 0)
+        contentResolver.update(uri, values, null, null)
+
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
+        mError!!.log(tag,"Saved \"$fileName\".")
+
+        return true
     }
 
     private fun fileSaveAnimation(bitmap: Bitmap?) {
@@ -981,14 +1081,14 @@ class MainActivity : Activity() {
         val imageview = ImageView(this)
         imageview.setImageBitmap(bitmap)
         imageview.z = 1.0f
-        tool_panel.z = 2.0f
+        mBinding.toolPanel.z = 2.0f
 
         val location = intArrayOf(0, 0)
-        button_save.getLocationInWindow(location)
+        mBinding.buttonSave.getLocationInWindow(location)
         val animation = ScaleAnimation(
                 1.0f, 0.0f, 1.0f, 0.0f,
-                Animation.ABSOLUTE, location[0] + button_save.measuredWidth / 2.0f,
-                Animation.ABSOLUTE, (location[1] + button_save.measuredHeight / 2.0f))
+                Animation.ABSOLUTE, location[0] + mBinding.buttonSave.measuredWidth / 2.0f,
+                Animation.ABSOLUTE, (location[1] + mBinding.buttonSave.measuredHeight / 2.0f))
         animation.duration = CAPTURE_ANIMATION_TIME
         animation.repeatCount = 0
         animation.fillAfter = true
@@ -996,12 +1096,12 @@ class MainActivity : Activity() {
             override fun onAnimationStart(p0: Animation?) {
             }
             override fun onAnimationEnd(p0: Animation?) {
-                frame_layout.removeView(imageview)
+                mBinding.frameLayout.removeView(imageview)
             }
             override fun onAnimationRepeat(p0: Animation?) {
             }
         })
-        frame_layout.addView(imageview, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        mBinding.frameLayout.addView(imageview, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         imageview.startAnimation(animation)
     }
 
@@ -1009,27 +1109,27 @@ class MainActivity : Activity() {
         // Hide Tool Panel and Status when there is no touch for 10 seconds
         mUITimerHandler = Handler()
         mUITimerRunnable = Runnable { hideUI() }
-        mUITimerHandler!!.postDelayed(mUITimerRunnable, PANEL_HIDDEN_INTERVAL)
+        mUITimerHandler!!.postDelayed(mUITimerRunnable!!, PANEL_HIDDEN_INTERVAL)
 
         // Update status on every one second
         mStatusTimerHandler = Handler()
         mStatusTimerRunnable = Runnable {
             updateTextLabels()
-            mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable, STATUS_INTERVAL)
+            mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable!!, STATUS_INTERVAL)
         }
-        mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable, STATUS_INTERVAL)
+        mStatusTimerHandler!!.postDelayed(mStatusTimerRunnable!!, STATUS_INTERVAL)
     }
 
     private fun restartUITimer() {
         mUITimerHandler ?: return
         mUITimerRunnable ?: return
-        mUITimerHandler!!.removeCallbacks(mUITimerRunnable)
-        mUITimerHandler!!.postDelayed(mUITimerRunnable, PANEL_HIDDEN_INTERVAL)
+        mUITimerHandler!!.removeCallbacks(mUITimerRunnable!!)
+        mUITimerHandler!!.postDelayed(mUITimerRunnable!!, PANEL_HIDDEN_INTERVAL)
     }
 
     private fun releaseTimers() {
-        mUITimerHandler!!.removeCallbacks(mUITimerRunnable)
-        mStatusTimerHandler!!.removeCallbacks(mStatusTimerRunnable)
+        mUITimerHandler!!.removeCallbacks(mUITimerRunnable!!)
+        mStatusTimerHandler!!.removeCallbacks(mStatusTimerRunnable!!)
     }
 
     private fun setupSound() {
@@ -1239,8 +1339,8 @@ class MainActivity : Activity() {
             }
         }
 
-        if (badge_number!!.visibility == View.VISIBLE) {
-            badge_number.text = (mSimulationRatio * 100).toInt().toString()
+        if (mBinding.badgeNumber!!.visibility == View.VISIBLE) {
+            mBinding.badgeNumber.text = (mSimulationRatio * 100).toInt().toString()
         }
     }
 
@@ -1250,7 +1350,7 @@ class MainActivity : Activity() {
     }
 
     private fun getDisplaySize(): Size {
-        return(Size(gl_surface_view_camera.width, gl_surface_view_camera.height))
+        return(Size(mBinding.glSurfaceViewCamera.width, mBinding.glSurfaceViewCamera.height))
     }
 
     private fun getDefaultDisplaySize(): Size {
@@ -1262,11 +1362,11 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
 
-        if (gl_surface_view_camera != null) {
-            gl_surface_view_camera.onResume()
+        if (mBinding.glSurfaceViewCamera != null) {
+            mBinding.glSurfaceViewCamera.onResume()
         }
-        if (gl_surface_view_file != null) {
-            gl_surface_view_file.onResume()
+        if (mBinding.glSurfaceViewFile != null) {
+            mBinding.glSurfaceViewFile.onResume()
         }
 
         // Setup "Ready To Save Image" intent from CVGLRenderer
@@ -1285,11 +1385,11 @@ class MainActivity : Activity() {
     }
 
     override fun onPause() {
-        if (gl_surface_view_camera != null) {
-            gl_surface_view_camera.onPause()
+        if (mBinding.glSurfaceViewCamera != null) {
+            mBinding.glSurfaceViewCamera.onPause()
         }
-        if (gl_surface_view_file != null) {
-            gl_surface_view_file.onPause()
+        if (mBinding.glSurfaceViewFile != null) {
+            mBinding.glSurfaceViewFile.onPause()
         }
 
         // Close camera
@@ -1339,8 +1439,8 @@ class MainActivity : Activity() {
         mPanX = savedInstanceState.getFloat("PanX")
         mPanY = savedInstanceState.getFloat("PanY")
         mZoom = savedInstanceState.getFloat("Zoom")
-        button_simulation_ratio.isEnabled = !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
-        badge_number.visibility = if (button_simulation_ratio.isEnabled && (mSimulationRatio < 1.0f)) View.VISIBLE else View.INVISIBLE
+        mBinding.buttonSimulationRatio.isEnabled = !(mCPDT[0] && !mCPDT[1] && !mCPDT[2] && !mCPDT[3])
+        mBinding.badgeNumber.visibility = if (mBinding.buttonSimulationRatio.isEnabled && (mSimulationRatio < 1.0f)) View.VISIBLE else View.INVISIBLE
 
         mRendererCamera!!.mCameraPosition = savedInstanceState.getInt("CameraPosition")
         if (mRendererCamera!!.mCamera == null) {
@@ -1357,7 +1457,7 @@ class MainActivity : Activity() {
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         resetPan()
         if (mIsImageFromFile) {
@@ -1399,22 +1499,22 @@ class MainActivity : Activity() {
     }
 
     private fun showCameraView() {
-        if (gl_surface_view_camera != null) {
-            gl_surface_view_camera.visibility = View.VISIBLE
+        if (mBinding.glSurfaceViewCamera != null) {
+            mBinding.glSurfaceViewCamera.visibility = View.VISIBLE
         }
 
-        if (gl_surface_view_file != null) {
-            gl_surface_view_file.visibility = View.INVISIBLE
+        if (mBinding.glSurfaceViewFile != null) {
+            mBinding.glSurfaceViewFile.visibility = View.INVISIBLE
         }
     }
 
     private fun showFileView() {
-        if (gl_surface_view_camera != null) {
-            gl_surface_view_camera.visibility = View.INVISIBLE
+        if (mBinding.glSurfaceViewCamera != null) {
+            mBinding.glSurfaceViewCamera.visibility = View.INVISIBLE
         }
 
-        if (gl_surface_view_file != null) {
-            gl_surface_view_file.visibility = View.VISIBLE
+        if (mBinding.glSurfaceViewFile != null) {
+            mBinding.glSurfaceViewFile.visibility = View.VISIBLE
         }
     }
 }
