@@ -891,6 +891,8 @@ class MainActivity : Activity() {
         mBinding.frameLayout.addView(mLabelZoom, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
     }
 
+    //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupFileSaveIntent() {
         mBroadCastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -912,8 +914,17 @@ class MainActivity : Activity() {
                 }
             }
         }
-        registerReceiver(mBroadCastReceiver, IntentFilter(CVGLRenderer.INTENT_FILTER))
-        startService(Intent(application, MainActivity::class.java))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                mBroadCastReceiver,
+                IntentFilter(CVGLRenderer.INTENT_FILTER),
+                RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            registerReceiver(mBroadCastReceiver, IntentFilter(CVGLRenderer.INTENT_FILTER))
+        }
+
+            startService(Intent(application, MainActivity::class.java))
     }
 
     private fun releaseFileSaveIntent() {
