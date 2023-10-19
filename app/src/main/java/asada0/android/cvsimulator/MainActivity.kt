@@ -892,7 +892,6 @@ class MainActivity : Activity() {
     }
 
     //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupFileSaveIntent() {
         mBroadCastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
