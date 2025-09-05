@@ -4,7 +4,7 @@
     <string name="splash_name">色覺模擬器</string>
     <string name="app_version">@string/versionName</string>
     <string name="app_description">Color Vision Simulation Tool</string>
-    <string name="app_copyright">Copyright 2019 Kazunori Asada.</string>
+    <string name="app_copyright">Copyright 2018-2025 Kazunori Asada.</string>
     <string name="app_allrights">All rights reserved.</string>
 
     <string name="sType">%s</string>
