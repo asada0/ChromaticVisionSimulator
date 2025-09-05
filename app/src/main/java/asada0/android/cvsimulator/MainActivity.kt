@@ -9,6 +9,7 @@
 package asada0.android.cvsimulator
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
@@ -40,6 +41,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.exifinterface.media.ExifInterface
 import asada0.android.cvsimulator.databinding.ActivityMainBinding
 import java.io.File
@@ -176,6 +181,8 @@ class MainActivity : Activity() {
         setContentView(mBinding.root)
         //setContentView(R.layout.activity_main)
 
+        optimizeEdgeToEdge() // 2025/09/05 for Android 15 and later
+
         // Setup mError
         mError = CVError(this)
 
@@ -226,6 +233,31 @@ class MainActivity : Activity() {
 
         // Show U/I
         showUI()
+    }
+
+    // 2025/09/05
+    private fun optimizeEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.frame_layout)) { root, windowInsets ->
+            /*
+            var actionBarHeight: Int = 0
+            val tv = TypedValue()
+            if (this.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+            }
+             */
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            root.updatePadding(
+                top = 0,
+                left = insets.left,
+                right = insets.right,
+                bottom = insets.bottom,
+            )
+            root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                //topMargin = actionBarHeight
+                topMargin = insets.top
+            }
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     private fun hasRearCamera(): Boolean {
@@ -892,6 +924,7 @@ class MainActivity : Activity() {
     }
 
     //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun setupFileSaveIntent() {
         mBroadCastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
