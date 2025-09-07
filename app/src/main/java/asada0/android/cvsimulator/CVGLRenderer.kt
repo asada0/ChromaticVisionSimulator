@@ -20,9 +20,11 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.hardware.display.DisplayManager
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.Size
+import android.view.Display
 import android.view.Surface
 import android.view.WindowManager
 import asada0.android.cvsimulator.databinding.ActivityMainBinding
@@ -152,7 +154,8 @@ open class CVGLRenderer(context: Context, activity: Activity) : GLSurfaceView.Re
     }
 
     private fun getDisplayRotation(): Int {
-        val rotation:Int = (mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        //val rotation: Int = (mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        val rotation: Int = (mContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager).getDisplay(Display.DEFAULT_DISPLAY).rotation // 2025/09/07
         return when (rotation) {
             Surface.ROTATION_0 -> 0 // Display rotation: 0 (Portrait on Smartphone)
             Surface.ROTATION_90 -> 1 // Display rotation: 90 (Landscape Left on Smartphone)
@@ -184,7 +187,8 @@ open class CVGLRenderer(context: Context, activity: Activity) : GLSurfaceView.Re
 
     private fun isPortraitDevice(): Boolean {
         val pIsDisplayOrientationPortrait: Boolean = mContext.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val pDisplayRotation: Int = (mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        //val pDisplayRotation: Int = (mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        val pDisplayRotation: Int = (mContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager).getDisplay(Display.DEFAULT_DISPLAY).rotation // 2025/09/07
         // Is this device's default orientation Portrait? Smart phone type device -> true, Tablet type device -> false
         return if (pIsDisplayOrientationPortrait) pDisplayRotation == Surface.ROTATION_0 || pDisplayRotation == Surface.ROTATION_180 else pDisplayRotation == Surface.ROTATION_90 || pDisplayRotation == Surface.ROTATION_270
     }
@@ -414,6 +418,9 @@ open class CVGLRenderer(context: Context, activity: Activity) : GLSurfaceView.Re
     }
 
     private fun sendReadyToSaveIntent() {
-        mContext.sendBroadcast(Intent(INTENT_FILTER))
+        val intent = Intent(INTENT_FILTER)
+        intent.setPackage(mContext.packageName)
+        //mContext.sendBroadcast(Intent(INTENT_FILTER))
+        mContext.sendBroadcast(intent) // 2025/09/07
     }
 }
