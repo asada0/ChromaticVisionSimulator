@@ -7,3 +7,6 @@
 /captures
 .externalNativeBuild
 /cvsimulator-android-3.1.zip
+
+# ローカル専用の開発メモ・開発日誌（公開リポジトリには含めない）
+/notes/
