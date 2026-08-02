@@ -418,9 +418,11 @@ open class CVGLRenderer(context: Context, activity: Activity) : GLSurfaceView.Re
     }
 
     private fun sendReadyToSaveIntent() {
-        val intent = Intent(INTENT_FILTER)
-        intent.setPackage(mContext.packageName)
-        //mContext.sendBroadcast(Intent(INTENT_FILTER))
-        mContext.sendBroadcast(intent) // 2025/09/07
+        // 2026/08/02 Notify on the main thread directly instead of using sendBroadcast().
+        // Broadcasts to context-registered receivers are no longer delivered reliably on
+        // recent Android (14+/16); a dropped completion broadcast left the save unfinished
+        // and the buttons disabled. A direct runOnUiThread callback removes that dependency.
+        val activity = mActivity ?: return
+        activity.runOnUiThread { (activity as MainActivity).onReadyToSave() }
     }
 }

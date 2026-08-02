@@ -12,11 +12,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.ContentValues
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -84,7 +82,6 @@ class MainActivity : Activity() {
     private var mUITimerRunnable: Runnable? = null
     private var mStatusTimerHandler: Handler? = null
     private var mStatusTimerRunnable: Runnable? = null
-    private var mBroadCastReceiver: BroadcastReceiver? = null
 
     private var mAnimeShowToolPanel: TranslateAnimation? = null
     private var mAnimeHideToolPanel: TranslateAnimation? = null
@@ -923,48 +920,23 @@ class MainActivity : Activity() {
         mBinding.frameLayout.addView(mLabelZoom, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
     }
 
-    //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    private fun setupFileSaveIntent() {
-        mBroadCastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val bitmap: Bitmap? = if (!mIsImageFromFile) mRendererCamera!!.mCaptureBitmap!! else mRendererFile!!.mCaptureBitmap!!
-                if (bitmap == null) {
-                    mError!!.log(tag, "File save error - bitmap == null(1).")
-                    mError!!.show(R.string.sFileSaveError)
-                    enableAllButton(true)
-                    return
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    realSave(bitmap)
-                } else {
-                    if (mHasStoragePermission) {
-                        realSave(bitmap)
-                    } else {
-                        requestPermission(fCamera = false, fStorage = true) { realSave(bitmap) }
-                    }
-                }
-            }
+    // 2026/08/02 Called on the main thread by CVGLRenderer when a capture is ready to save.
+    // (Replaces the former READY_TO_SAVE_ACTION broadcast, which recent Android no longer delivers reliably.)
+    fun onReadyToSave() {
+        val bitmap: Bitmap? = if (!mIsImageFromFile) mRendererCamera!!.mCaptureBitmap!! else mRendererFile!!.mCaptureBitmap!!
+        if (bitmap == null) {
+            mError!!.log(tag, "File save error - bitmap == null(1).")
+            mError!!.show(R.string.sFileSaveError)
+            enableAllButton(true)
+            return
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(
-                mBroadCastReceiver,
-                IntentFilter(CVGLRenderer.INTENT_FILTER),
-                RECEIVER_NOT_EXPORTED
-            )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            realSave(bitmap)
         } else {
-            registerReceiver(mBroadCastReceiver, IntentFilter(CVGLRenderer.INTENT_FILTER))
-        }
-
-            startService(Intent(application, MainActivity::class.java))
-    }
-
-    private fun releaseFileSaveIntent() {
-        if (mBroadCastReceiver != null) {
-            try {
-                unregisterReceiver(mBroadCastReceiver)
-            } catch (e: IllegalArgumentException) {
-                // Sometimes error is occurred in unregisterReceiver(mBroadCastReceiver)
+            if (mHasStoragePermission) {
+                realSave(bitmap)
+            } else {
+                requestPermission(fCamera = false, fStorage = true) { realSave(bitmap) }
             }
         }
     }
@@ -1411,9 +1383,6 @@ class MainActivity : Activity() {
             mBinding.glSurfaceViewFile.onResume()
         }
 
-        // Setup "Ready To Save Image" intent from CVGLRenderer
-        setupFileSaveIntent()
-
         // Setup Timer
         setupTimers()
 
@@ -1438,9 +1407,6 @@ class MainActivity : Activity() {
         if (!mIsImageFromFile) {
             mRendererCamera!!.closeCamera()
         }
-
-        // Release "Ready To Save Image" intent
-        releaseFileSaveIntent()
 
         // Release timers
         releaseTimers()
